@@ -45,43 +45,59 @@
 * RMS_R = 0.048 км;
 * RMS_Az = 0.008 град;
 * RMS_Vr = 0.016 м/с;
+
 ***
-<center>Рис.1 - RMSE вектора состояния при изменении параметра разброса сигма-точек alpha=1.0...0.35</center>
-\image html  doc/pictures/merwe_good/COMPARE_EKF_SRUKF_Merwe_x__RMSE_X_MCruns_10000__dt_1.000000.png width=1200px
-\image latex doc/pictures/merwe_good/COMPARE_EKF_SRUKF_Merwe_x__RMSE_X_MCruns_10000__dt_1.000000.png
+<center>Рис.1 - RMSE вектора состояния при изменении параметра разброса сигма-точек alpha=1.0...0.35 (от светлого к темному)</center>
+<center><img src="doc/pictures/merwe_good/COMPARE_EKF_SRUKF_Merwe_x__RMSE_X_MCruns_10000__dt_1.000000.png" width="1000px" /></center>
+<?\image html merwe_good/COMPARE_EKF_SRUKF_Merwe_x__RMSE_X_MCruns_10000__dt_1.000000.png width=1200px?>
+<?\image latex merwe_good/COMPARE_EKF_SRUKF_Merwe_x__RMSE_X_MCruns_10000__dt_1.000000.png?>
 
-\image html  doc/pictures/merwe_good/COMPARE_EKF_SRUKF_Merwe_y__RMSE_X_MCruns_10000__dt_1.000000.png width=1200px
-\image latex doc/pictures/merwe_good/COMPARE_EKF_SRUKF_Merwe_y__RMSE_X_MCruns_10000__dt_1.000000.png
+<center><img src="doc/pictures/merwe_good/COMPARE_EKF_SRUKF_Merwe_y__RMSE_X_MCruns_10000__dt_1.000000.png" width="1000px" /></center>
+<?\image html merwe_good/COMPARE_EKF_SRUKF_Merwe_y__RMSE_X_MCruns_10000__dt_1.000000.png width=1200px?>
+<?\image latex merwe_good/COMPARE_EKF_SRUKF_Merwe_y__RMSE_X_MCruns_10000__dt_1.000000.png?>
 
-\image html  doc/pictures/merwe_good/COMPARE_EKF_SRUKF_Merwe_v__RMSE_X_MCruns_10000__dt_1.000000.png width=1200px
-\image latex doc/pictures/merwe_good/COMPARE_EKF_SRUKF_Merwe_v__RMSE_X_MCruns_10000__dt_1.000000.png
+<center><img src="doc/pictures/merwe_good/COMPARE_EKF_SRUKF_Merwe_v__RMSE_X_MCruns_10000__dt_1.000000.png" width="1000px" /></center>
+<?\image html merwe_good/COMPARE_EKF_SRUKF_Merwe_v__RMSE_X_MCruns_10000__dt_1.000000.png width=1200px?>
+<?\image latex merwe_good/COMPARE_EKF_SRUKF_Merwe_v__RMSE_X_MCruns_10000__dt_1.000000.png?>
 
-\image html  doc/pictures/merwe_good/COMPARE_EKF_SRUKF_Merwe_k__RMSE_X_MCruns_10000__dt_1.000000.png width=1200px
-\image latex doc/pictures/merwe_good/COMPARE_EKF_SRUKF_Merwe_k__RMSE_X_MCruns_10000__dt_1.000000.png
+<center><img src="doc/pictures/merwe_good/COMPARE_EKF_SRUKF_Merwe_k__RMSE_X_MCruns_10000__dt_1.000000.png" width="1000px" /></center>
+<?\image html merwe_good/COMPARE_EKF_SRUKF_Merwe_k__RMSE_X_MCruns_10000__dt_1.000000.png width=1200px?>
+<?\image latex merwe_good/COMPARE_EKF_SRUKF_Merwe_k__RMSE_X_MCruns_10000__dt_1.000000.png?>
 
-\image html  doc/pictures/merwe_good/COMPARE_EKF_SRUKF_Merwe_ka__RMSE_X_MCruns_10000__dt_1.000000.png width=1200px
-\image latex doc/pictures/merwe_good/COMPARE_EKF_SRUKF_Merwe_ka__RMSE_X_MCruns_10000__dt_1.000000.png
+<center><img src="doc/pictures/merwe_good/COMPARE_EKF_SRUKF_Merwe_ka__RMSE_X_MCruns_10000__dt_1.000000.png" width="1000px" /></center>
+<?\image html merwe_good/COMPARE_EKF_SRUKF_Merwe_ka__RMSE_X_MCruns_10000__dt_1.000000.png width=1200px?>
+<?\image latex merwe_good/COMPARE_EKF_SRUKF_Merwe_ka__RMSE_X_MCruns_10000__dt_1.000000.png?>
+
 ***
 <center>Рис.2 - Сравнение RMSE вектора состояния</center>
-\image html  doc/pictures/RMSE_good/EKF_SRUKFB_SRCKFB_SREUKFB_SRECKFB_RMSE_X_X_MCruns_10000__P_1.0_dt_1.000000.png width=1200px
-\image latex doc/pictures/RMSE_good/EKF_SRUKFB_SRCKFB_SREUKFB_SRECKFB_RMSE_X_X_MCruns_10000__P_1.0_dt_1.000000.png 
+<center><img src="doc/pictures/RMSE_good/EKF_SRUKFB_SRCKFB_SREUKFB_SRECKFB_RMSE_X_X_MCruns_10000__P_1.0_dt_1.000000.png" width="1000px" /></center>
+<?\image html  RMSE_good/EKF_SRUKFB_SRCKFB_SREUKFB_SRECKFB_RMSE_X_X_MCruns_10000__P_1.0_dt_1.000000.png width=1200px?>
+<?\image latex RMSE_good/EKF_SRUKFB_SRCKFB_SREUKFB_SRECKFB_RMSE_X_X_MCruns_10000__P_1.0_dt_1.000000.png?>
 
-\image html  doc/pictures/RMSE_good/EKF_SRUKFB_SRCKFB_SREUKFB_SRECKFB_RMSE_X_Y_MCruns_10000__P_1.0_dt_1.000000.png width=1200px
-\image latex doc/pictures/RMSE_good/EKF_SRUKFB_SRCKFB_SREUKFB_SRECKFB_RMSE_X_Y_MCruns_10000__P_1.0_dt_1.000000.png 
+<center><img src="doc/pictures/RMSE_good/EKF_SRUKFB_SRCKFB_SREUKFB_SRECKFB_RMSE_X_Y_MCruns_10000__P_1.0_dt_1.000000.png" width="1000px" /></center>
+<?\image html  RMSE_good/EKF_SRUKFB_SRCKFB_SREUKFB_SRECKFB_RMSE_X_Y_MCruns_10000__P_1.0_dt_1.000000.png width=1200px?>
+<?\image latex RMSE_good/EKF_SRUKFB_SRCKFB_SREUKFB_SRECKFB_RMSE_X_Y_MCruns_10000__P_1.0_dt_1.000000.png?> 
 
-\image html  doc/pictures/RMSE_good/EKF_SRUKFB_SRCKFB_SREUKFB_SRECKFB_RMSE_X_V_MCruns_10000__P_1.0_dt_1.000000.png width=1200px
-\image latex doc/pictures/RMSE_good/EKF_SRUKFB_SRCKFB_SREUKFB_SRECKFB_RMSE_X_V_MCruns_10000__P_1.0_dt_1.000000.png 
+<center><img src="doc/pictures/RMSE_good/EKF_SRUKFB_SRCKFB_SREUKFB_SRECKFB_RMSE_X_V_MCruns_10000__P_1.0_dt_1.000000.png" width="1000px" /></center>
+<?\image html  RMSE_good/EKF_SRUKFB_SRCKFB_SREUKFB_SRECKFB_RMSE_X_V_MCruns_10000__P_1.0_dt_1.000000.png width=1200px?>
+<?\image latex RMSE_good/EKF_SRUKFB_SRCKFB_SREUKFB_SRECKFB_RMSE_X_V_MCruns_10000__P_1.0_dt_1.000000.png?> 
 
-\image html  doc/pictures/RMSE_good/EKF_SRUKFB_SRCKFB_SREUKFB_SRECKFB_RMSE_X_K_MCruns_10000__P_1.0_dt_1.000000.png width=1200px
-\image latex doc/pictures/RMSE_good/EKF_SRUKFB_SRCKFB_SREUKFB_SRECKFB_RMSE_X_K_MCruns_10000__P_1.0_dt_1.000000.png 
+<center><img src="doc/pictures/RMSE_good/EKF_SRUKFB_SRCKFB_SREUKFB_SRECKFB_RMSE_X_K_MCruns_10000__P_1.0_dt_1.000000.png" width="1000px" /></center>
+<?\image html  RMSE_good/EKF_SRUKFB_SRCKFB_SREUKFB_SRECKFB_RMSE_X_K_MCruns_10000__P_1.0_dt_1.000000.png width=1200px?>
+<?\image latex RMSE_good/EKF_SRUKFB_SRCKFB_SREUKFB_SRECKFB_RMSE_X_K_MCruns_10000__P_1.0_dt_1.000000.png?> 
 
-\image html  doc/pictures/RMSE_good/EKF_SRUKFB_SRCKFB_SREUKFB_SRECKFB_RMSE_X_Ka_MCruns_10000__P_1.0_dt_1.000000.png width=1200px
-\image latex doc/pictures/RMSE_good/EKF_SRUKFB_SRCKFB_SREUKFB_SRECKFB_RMSE_X_Ka_MCruns_10000__P_1.0_dt_1.000000.png 
+<center><img src="doc/pictures/RMSE_good/EKF_SRUKFB_SRCKFB_SREUKFB_SRECKFB_RMSE_X_Ka_MCruns_10000__P_1.0_dt_1.000000.png" width="1000px" /></center>
+<?\image html RMSE_good/EKF_SRUKFB_SRCKFB_SREUKFB_SRECKFB_RMSE_X_Ka_MCruns_10000__P_1.0_dt_1.000000.png width=1200px?>
+<?\image latex RMSE_good/EKF_SRUKFB_SRCKFB_SREUKFB_SRECKFB_RMSE_X_Ka_MCruns_10000__P_1.0_dt_1.000000.png?> 
+
 ***
 <center>Рис.3 - Время выполнения относительно EKF при JQR разложении в SRUKF фильтрах</center>
-\image html  doc/pictures/RMSE_good/time_compare_1.png  width=1200px
-\image latex doc/pictures/RMSE_good/time_compare_1.png 
+<center><img src="doc/pictures/RMSE_good/time_compare_1.png" width="1000px" /></center>
+<?\image html RMSE_good/time_compare_1.png  width=1200px?>
+<?\image latex RMSE_good/time_compare_1.png?> 
+
 ***
 <center>Рис.4 - Время выполнения относительно EKF при QR разложении в SRUKF фильтрах</center>
-\image html  doc/pictures/RMSE_good/time_compare_2.png  width=1200px
-\image latex doc/pictures/RMSE_good/time_compare_2.png 
+<center><img src="doc/pictures/RMSE_good/time_compare_2.png" width="1000px" /></center>
+<?\image html RMSE_good/time_compare_2.png  width=1200px?>
+<?\image latex RMSE_good/time_compare_2.png?> 
