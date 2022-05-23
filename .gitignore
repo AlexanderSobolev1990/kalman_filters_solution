@@ -1,0 +1,5 @@
+/bin
+/build
+/doc/html
+/doc/latex
+CMakeLists.txt.user

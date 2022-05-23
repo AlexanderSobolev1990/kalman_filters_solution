@@ -1,0 +1,2 @@
+./compare --rmse --srukf --time 300 --alpha_sr 1.0 0.7 0.6 0.55 0.5 0.45 0.4 0.35 --beta_sr 2 --kappa_sr -2 --set 1 --mc 100 --size 50 20 --sep --par 0.15 0.2 0.95 0.9 0.4 0.4
+
