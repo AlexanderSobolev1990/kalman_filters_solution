@@ -23,9 +23,7 @@ add_compile_options(
 
 add_subdirectory(src/kalman_filters)
 add_subdirectory(src/compare)
-
-#enable_testing()
-#add_subdirectory(test)
+add_subdirectory(test)
 
 # Генерация документации
 if(BUILD_DOCUMENTATION)

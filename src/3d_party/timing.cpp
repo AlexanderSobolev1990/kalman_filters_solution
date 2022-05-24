@@ -25,17 +25,14 @@ CTimeKeeper::CTimeKeeper()
 
 void CTimeKeeper::StartTimer()
 {
-//    startCur_ = std::chrono::steady_clock::now();
     startCur_ = std::chrono::high_resolution_clock::now();
 }
 
 void CTimeKeeper::EndTimer()
 {
     // Статистика по текущей операции
-//    endCur_ = std::chrono::steady_clock::now();
     endCur_ = std::chrono::high_resolution_clock::now();
     durationCur_ = endCur_ - startCur_;
-//    timeCur_ = double( durationCur_.count() ) * std::chrono::steady_clock::period::num / std::chrono::steady_clock::period::den;
     timeCur_ = double( durationCur_.count() ) * std::chrono::high_resolution_clock::period::num / std::chrono::high_resolution_clock::period::den;
 
     // Суммарная статистика

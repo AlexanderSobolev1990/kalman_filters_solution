@@ -59,5 +59,4 @@ double zmach ( int job );
 complex <double> zsign1 ( complex <double> z1, complex <double> z2 );
 complex <double> zsign2 ( complex <double> z1, complex <double> z2 );
 
-
 #endif // BLAS0_H

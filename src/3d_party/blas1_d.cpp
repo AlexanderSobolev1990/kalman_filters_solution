@@ -1090,4 +1090,3 @@ int idamax ( int n, double dx[], int incx )
 
   return value;
 }
-

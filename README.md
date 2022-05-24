@@ -1,6 +1,6 @@
-# Результаты моделирования фильтров Калмана #
-***
+# Нелинейные фильтры Калмана и их гибриды (Nonlinear Kalman filters and their hybrids) ##
 
+***
 1)  ЛФК - Линейный Фильтр Калмана (LKF - Linear Kalman Filter);  
 2)  РФК - Расширенный Фильтр Калмана (EKF - Extended Kalman Filter);  
 3)  ККРФК - Квадратно-Корневой Расширенный Фильтр Калмана (SREKF - Square Root Extended Kalman Filter);  
@@ -47,7 +47,8 @@
 * RMS_Vr = 0.016 м/с;
 
 ***
-<center>Рис.1 - RMSE вектора состояния при изменении параметра разброса сигма-точек alpha=1.0...0.35 (от светлого к темному)</center>
+<center>Рис.1 - RMSE вектора состояния при изменении параметра разброса сигма-точек alpha=1.0...0.35 (от светлого к темному),
+beta=2, kappa=-2</center>
 <center><img src="doc/pictures/merwe_good/COMPARE_EKF_SRUKF_Merwe_x__RMSE_X_MCruns_10000__dt_1.000000.png" width="1000px" /></center>
 <?\image html merwe_good/COMPARE_EKF_SRUKF_Merwe_x__RMSE_X_MCruns_10000__dt_1.000000.png width=1200px?>
 <?\image latex merwe_good/COMPARE_EKF_SRUKF_Merwe_x__RMSE_X_MCruns_10000__dt_1.000000.png?>

@@ -48,28 +48,29 @@ int sgn2( T val, T tol ) {
 ///
 /// \brief J-ортогональное QR разложение
 /// \details Приводится по:
-/// \param[out] Q    -
-/// \param[out] R    -
-/// \param[out] J1   -
-/// \param[in]  A    -
-/// \param[in]  J0   -
-/// \param[in]  econ -
-/// \param[in]  tol  -
-/// \return
+/// \param[out] Q    - выходная Q матрица
+/// \param[out] R    - выходная R матрица
+/// \param[out] J1   - выходная матрица знаков J
+/// \param[in]  A    - входная матрица
+/// \param[in]  J0   - входная матрица знаков J
+/// \param[in]  econ - признак экономичного возврата (true по-умолчанию)
+/// \param[in]  tol  - точность при сравнениях double
+/// \return 0 - успех, 1 - ошибка
 ///
 int J_orthogonal( arma::mat &Q, arma::mat &R, arma::mat &J1, const arma::mat &A, const arma::mat &J0,
-    bool econ = true, double tol = 1.0e-16 ); //1.0e-9
+    bool econ = true, double tol = 1.0e-16 );
 
 //----------------------------------------------------------------------------------------------------------------------
 ///
 /// \brief Модифицированное QR-разложение Грама-Шмидта
 /// \details Приводится по G. W. Stewart, “Matrix Algorithms, Volume 1: Basic Decompositions”, SIAM, 1998, стр.300(279)
-/// \param[out] Q -
-/// \param[out] R -
-/// \param[in]  X -
-/// \return
+/// \details Экономичный возврат
+/// \param[out] Q    - выходная Q матрица
+/// \param[out] R    - выходная R матрица
+/// \param[in]  A    - входная матрица
+/// \return 0 - успех, 1 - ошибка
 ///
-int ModifiedGramSchmidt( arma::mat &Q, arma::mat &R, const arma::mat &X );
+int ModifiedGramSchmidt( arma::mat &Q, arma::mat &R, const arma::mat &A );
 
 //----------------------------------------------------------------------------------------------------------------------
 ///
@@ -78,13 +79,14 @@ int ModifiedGramSchmidt( arma::mat &Q, arma::mat &R, const arma::mat &X );
 /// SEMINAR FUER ANGEWANDTE MATHEMATIK EIDGENOESSISCHE TECHNISCHE HOCHSCHULE CH-8092 ZUERICH
 /// \details Модифицировано под C++:
 /// https://github.com/SPancratz/flint2/blob/69395ab1a939212533ac9cdbff69f67e0b35da8f/mpf_mat/qr.c
-/// \param[out] Q   -
-/// \param[out] R   -
-/// \param[in]  A   -
-/// \param[in]  tol -
-/// \return
+/// \param[out] Q    - выходная Q матрица
+/// \param[out] R    - выходная R матрица
+/// \param[in]  A    - входная матрица
+/// \param[in]  econ - признак экономичного возврата (true по-умолчанию)
+/// \param[in]  tol  - точность при сравнениях double
+/// \return 0 - успех, 1 - ошибка
 ///
-int SchwarzRutishauser( arma::mat &Q, arma::mat &R, const arma::mat &A, double tol = 1.0e-9 );
+int SchwarzRutishauser( arma::mat &Q, arma::mat &R, const arma::mat &A, bool econ = true, double tol = 1.0e-9 );
 
 } // end QR
 } // end SPML

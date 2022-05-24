@@ -12,7 +12,7 @@ set(DOXYGEN_IMAGE_PATH ${SOLUTION_DIR}/doc/pictures/)
 
 set(DOXYGEN_DOXYFILE_ENCODING UTF-8)
 set(DOXYGEN_OUTPUT_LANGUAGE RUSSIAN)
-set(DOXYGEN_PROJECT_NAME "Фильтры Калмана")
+set(DOXYGEN_PROJECT_NAME "Нелинейные фильтры Калмана и их гибриды")
 set(DOXYGEN_PROJECT_BRIEF "Программная документация")
 set(DOXYGEN_EXTRACT_ALL YES) #NO) #
 set(DOXYGEN_EXTRACT_PRIVATE YES) #NO) #

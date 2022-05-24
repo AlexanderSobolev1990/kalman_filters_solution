@@ -67,7 +67,11 @@ public:
         deltaY_isSet( false ),
         Y_msd_isSet( false ),
         prediction_isDone( false )
-    {}
+    {
+#ifdef DEBUG_KALMAN_CONSTRUCTORS
+        std::cout << "default constructor LKF" << std::endl;
+#endif
+    }
 
     ///
     /// \brief Конструктор копирования
@@ -75,6 +79,9 @@ public:
     ///
     CKalmanLKF( const CKalmanLKF &other )
     {
+#ifdef DEBUG_KALMAN_CONSTRUCTORS
+        std::cout << "copy constructor LKF" << std::endl;
+#endif
         this->SizeX_ = other.SizeX_;
         this->SizeY_ = other.SizeY_;
 
@@ -108,6 +115,9 @@ public:
     ///
     CKalmanLKF& operator=( const CKalmanLKF &other )
     {
+#ifdef DEBUG_KALMAN_CONSTRUCTORS
+        std::cout << "copy assignment LKF" << std::endl;
+#endif
         CKalmanLKF copy( other );
         swap( *this, copy );
         return *this;
@@ -143,6 +153,9 @@ public:
         Y_msd_isSet( false ),
         prediction_isDone( false )
     {
+#ifdef DEBUG_KALMAN_CONSTRUCTORS
+        std::cout << "move constructor LKF" << std::endl;
+#endif
         swap( *this, other );
     }
 
@@ -153,12 +166,24 @@ public:
     ///
     CKalmanLKF& operator=( CKalmanLKF &&other ) noexcept
     {
+#ifdef DEBUG_KALMAN_CONSTRUCTORS
+        std::cout << "move assignment LKF" << std::endl;
+#endif
         swap( *this, other );
         return *this;
     }
 
+#ifdef DEBUG_KALMAN_CONSTRUCTORS
+    ///
+    /// \brief Дестркутор
+    ///
+    virtual ~CKalmanLKF()
+    {
+        std::cout << "destructor LKF" << std::endl;
+    }
+#elif
     virtual ~CKalmanLKF() = default; ///< Дестркутор
-
+#endif
     ///
     /// \brief Метод свапа
     /// \param lhs - left hand side instance

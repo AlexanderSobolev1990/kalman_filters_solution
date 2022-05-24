@@ -13,6 +13,4 @@ void dscal ( int n, double sa, double x[], int incx );
 void dswap ( int n, double x[], int incx, double y[], int incy );
 int idamax ( int n, double dx[], int incx );
 
-
-
 #endif // BLAS1_D_H

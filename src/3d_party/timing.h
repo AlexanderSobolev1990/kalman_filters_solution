@@ -43,15 +43,11 @@ public:
     CTimeKeeper(); ///< Конструктор
 
 private:
-//    std::chrono::steady_clock::duration durationSum_; ///< Интервал (суммарный)
     std::chrono::high_resolution_clock::duration durationSum_; ///< Интервал (суммарный)
     int intervalsNumber_;   ///< Число интервалов вошедших в суммарный интервал
     double timeSum_;        ///< Интервал (суммарный) в секундах
     double timePerOp_;      ///< Интервал на 1 операцию в секундах
 
-//    std::chrono::steady_clock::time_point startCur_;    ///< Начало измерения (текущего)
-//    std::chrono::steady_clock::time_point endCur_;      ///< Конец измерения (текущего)
-//    std::chrono::steady_clock::duration durationCur_;   ///< Интервал (текущий)
     std::chrono::high_resolution_clock::time_point startCur_;    ///< Начало измерения (текущего)
     std::chrono::high_resolution_clock::time_point endCur_;      ///< Конец измерения (текущего)
     std::chrono::high_resolution_clock::duration durationCur_;   ///< Интервал (текущий)

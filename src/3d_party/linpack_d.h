@@ -44,5 +44,4 @@ double dtrco ( double t[], int ldt, int n, double z[], int job );
 int dtrdi ( double t[], int ldt, int n, double det[], int job );
 int dtrsl ( double t[], int ldt, int n, double b[], int job );
 
-
 #endif // LINPACK_D_H
