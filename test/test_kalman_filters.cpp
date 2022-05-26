@@ -18,15 +18,17 @@
 
 //#include <compare.h>
 #include <kalman_filter_linear.h>
+#include <kalman_filter_unscented.h>
+#include <kalman_filter_extended_unscented_square_root.h>
 
 const bool print_to_console = false;//true;//
 
 const size_t dimX = 2;
 const size_t dimY = 3;
-/*
+
 BOOST_AUTO_TEST_CASE( test_LKF_insert_delete_map )
 {
-    CKalmanFiltersCompare c;
+//    CKalmanFiltersCompare c;
     KalmanFilters::CKalmanLKF<dimX, dimY> lkf1, lkf2, lkf3;
     arma::mat A1( dimX, dimX ), A2( dimX, dimX ), A3( dimX, dimX );
     A1.fill( 1.0 );
@@ -68,7 +70,7 @@ BOOST_AUTO_TEST_CASE( test_LKF_insert_delete_map )
 
 BOOST_AUTO_TEST_CASE( test_UKF_insert_delete_map )
 {
-    CKalmanFiltersCompare c;
+//    CKalmanFiltersCompare c;
     KalmanFilters::CKalmanUKF<dimX, dimY> lkf1, lkf2, lkf3;
     arma::mat A1( dimX, dimX ), A2( dimX, dimX ), A3( dimX, dimX );
     A1.fill( 1.0 );
@@ -111,7 +113,7 @@ BOOST_AUTO_TEST_CASE( test_UKF_insert_delete_map )
 
 BOOST_AUTO_TEST_CASE( test_CKalmanSREUKFB_insert_delete_map )
 {
-    CKalmanFiltersCompare c;
+//    CKalmanFiltersCompare c;
     KalmanFilters::CKalmanSREUKFB<dimX, dimY> lkf1, lkf2, lkf3;
     arma::mat A1( dimX, dimX ), A2( dimX, dimX ), A3( dimX, dimX );
     A1.fill( 1.0 );
@@ -151,7 +153,7 @@ BOOST_AUTO_TEST_CASE( test_CKalmanSREUKFB_insert_delete_map )
     BOOST_CHECK_EQUAL( filters.count( 2 ), 0 );
 
 }
-*/
+
 BOOST_AUTO_TEST_CASE( test_LKF_insert_delete_vector )
 {
 //    CKalmanFiltersCompare c;
@@ -191,10 +193,10 @@ BOOST_AUTO_TEST_CASE( test_LKF_insert_delete_vector )
 
     BOOST_CHECK_EQUAL( filters.size(), 2 );
 }
-/*
+
 BOOST_AUTO_TEST_CASE( test_UKF_insert_delete_vector )
 {
-    CKalmanFiltersCompare c;
+//    CKalmanFiltersCompare c;
     KalmanFilters::CKalmanUKF<dimX, dimY> lkf1, lkf2, lkf3;
     arma::mat A1( dimX, dimX ), A2( dimX, dimX ), A3( dimX, dimX );
     A1.fill( 1.0 );
@@ -235,7 +237,7 @@ BOOST_AUTO_TEST_CASE( test_UKF_insert_delete_vector )
 
 BOOST_AUTO_TEST_CASE( test_SREUKFB_insert_delete_vector )
 {
-    CKalmanFiltersCompare c;
+//    CKalmanFiltersCompare c;
     KalmanFilters::CKalmanSREUKFB<dimX, dimY> lkf1, lkf2, lkf3;
     arma::mat A1( dimX, dimX ), A2( dimX, dimX ), A3( dimX, dimX );
     A1.fill( 1.0 );
@@ -272,9 +274,3 @@ BOOST_AUTO_TEST_CASE( test_SREUKFB_insert_delete_vector )
 
     BOOST_CHECK_EQUAL( filters.size(), 2 );
 }
-
-
-
-
-
-*/
