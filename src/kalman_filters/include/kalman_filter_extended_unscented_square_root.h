@@ -61,61 +61,6 @@ public:
         createSignMatrices();
     }
 
-    ///
-    /// \brief Конструктор копирования
-    /// \param other - экземпляр, с которого делается копия
-    ///
-    CKalmanSREUKF( const CKalmanSREUKF &other ) : CKalmanEKF<SizeX, SizeY>( other ), CKalmanSRUKF<SizeX, SizeY>( other )
-    {}
-
-    ///
-    /// \brief Перегрузка оператора присвоения
-    /// \param other - экземпляр, с которого делается копия
-    /// \return *this
-    ///
-    CKalmanSREUKF& operator=( const CKalmanSREUKF &other )
-    {
-        CKalmanSREUKF copy( other );
-        swap( *this, copy );
-        return *this;
-    }
-
-    ///
-    /// \brief Конструктор перемещения
-    /// \param other - экземпляр, с которого делается копия
-    ///
-    CKalmanSREUKF( CKalmanSREUKF &&other ) noexcept
-    {
-        swap( *this, other );
-    }
-
-    ///
-    /// \brief Перегрузка оператора перемещения
-    /// \param other - экземпляр, с которого делается копия
-    /// \return *this
-    ///
-    CKalmanSREUKF& operator=( CKalmanSREUKF &&other ) noexcept
-    {
-        swap( *this, other );
-        return *this;
-    }
-
-    virtual ~CKalmanSREUKF() = default; ///< Дестркутор
-
-    ///
-    /// \brief Метод свапа
-    /// \param lhs - left hand side instance
-    /// \param rhs - right hand side instance
-    ///
-    friend void swap( CKalmanSREUKF<SizeX, SizeY> &lhs, CKalmanSREUKF<SizeX, SizeY> &rhs ) noexcept
-    {
-        swap( dynamic_cast< CKalmanEKF<SizeX, SizeY> &>( lhs ), dynamic_cast< CKalmanEKF<SizeX, SizeY> &>( rhs ) ); // Свап предка 1 порядка
-        swap( dynamic_cast< CKalmanSRUKF<SizeX, SizeY> &>( lhs ), dynamic_cast< CKalmanSRUKF<SizeX, SizeY> &>( rhs ) ); // Свап предка 1 порядка
-
-        std::swap( lhs.J_, rhs.J_ );
-        std::swap( lhs.Jcorrect_, rhs.Jcorrect_ );
-    }
-
     //------------------------------------------------------------------------------------------------------------------
     // Методы прогноза и коррекции:
 
@@ -217,7 +162,7 @@ public:
 #endif
         this->createSignMatricesBlock();
     }
-
+/*
     ///
     /// \brief Конструктор копирования
     /// \param other - экземпляр, с которого делается копия
@@ -270,7 +215,7 @@ public:
 
         std::swap( lhs.JcorrectBlock_, rhs.JcorrectBlock_ );
     }
-
+*/
     //------------------------------------------------------------------------------------------------------------------
     // Методы прогноза и коррекции:
 

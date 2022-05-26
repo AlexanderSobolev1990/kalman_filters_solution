@@ -67,155 +67,15 @@ public:
         deltaY_isSet( false ),
         Y_msd_isSet( false ),
         prediction_isDone( false )
-    {
-#ifdef DEBUG_KALMAN_CONSTRUCTORS
-        std::cout << "default constructor LKF" << std::endl;
-#endif
-    }
+    {}
 
-    ///
-    /// \brief Конструктор копирования
-    /// \param other - экземпляр, с которого делается копия
-    ///
-    CKalmanLKF( const CKalmanLKF &other )
-    {
-#ifdef DEBUG_KALMAN_CONSTRUCTORS
-        std::cout << "copy constructor LKF" << std::endl;
-#endif
-        this->SizeX_ = other.SizeX_;
-        this->SizeY_ = other.SizeY_;
+    // default copy/move/assignment semantic:
 
-        this->F_ = other.F_;
-        this->H_ = other.H_;
-
-        this->K_ = other.K_;
-        this->I_ = other.I_;
-        this->DeltaY_ = other.DeltaY_;
-
-        this->P_ = other.P_;
-        this->S_ = other.S_;
-        this->Q_ = other.Q_;
-        this->R_ = other.R_;
-
-        this->X_pred_ = other.X_pred_;
-        this->Y_pred_ = other.Y_pred_;
-        this->X_est_ = other.X_est_;
-        this->Y_est_ = other.Y_est_;
-        this->Y_msd_ = other.Y_msd_;
-
-        this->deltaY_isSet = other.deltaY_isSet;
-        this->Y_msd_isSet = other.Y_msd_isSet;
-        this->prediction_isDone = other.prediction_isDone;
-    }
-
-    ///
-    /// \brief Перегрузка оператора присвоения
-    /// \param other - экземпляр, с которого делается копия
-    /// \return *this
-    ///
-    CKalmanLKF& operator=( const CKalmanLKF &other )
-    {
-#ifdef DEBUG_KALMAN_CONSTRUCTORS
-        std::cout << "copy assignment LKF" << std::endl;
-#endif
-        CKalmanLKF copy( other );
-        swap( *this, copy );
-        return *this;
-    }
-
-    ///
-    /// \brief Конструктор перемещения
-    /// \param other - экземпляр, с которого делается копия
-    ///
-    CKalmanLKF( CKalmanLKF &&other ) noexcept :
-        SizeX_( SizeX ),
-        SizeY_( SizeY ),
-
-        F_( arma::eye( SizeX_, SizeX_ ) ),
-        H_( arma::zeros( SizeY_, SizeX_ ) ),
-
-        K_( arma::zeros( SizeX_, SizeY_ ) ),
-        I_( arma::eye( SizeX_, SizeX_ ) ),
-        DeltaY_( arma::zeros( SizeY_ ) ),
-
-        P_( arma::zeros( SizeX_, SizeX_ ) ),
-        S_( arma::zeros( SizeY_, SizeY_ ) ),
-        Q_( arma::zeros( SizeX_, SizeX_ ) ),
-        R_( arma::zeros( SizeY_, SizeY_ ) ),
-
-        X_pred_( arma::zeros( SizeX_ ) ),
-        Y_pred_( arma::zeros( SizeY_ ) ),
-        X_est_( arma::zeros( SizeX_ ) ),
-        Y_est_( arma::zeros( SizeY_ ) ),
-        Y_msd_( arma::zeros( SizeY_ ) ),
-
-        deltaY_isSet( false ),
-        Y_msd_isSet( false ),
-        prediction_isDone( false )
-    {
-#ifdef DEBUG_KALMAN_CONSTRUCTORS
-        std::cout << "move constructor LKF" << std::endl;
-#endif
-        swap( *this, other );
-    }
-
-    ///
-    /// \brief Перегрузка оператора перемещения
-    /// \param other - экземпляр, с которого делается копия
-    /// \return *this
-    ///
-    CKalmanLKF& operator=( CKalmanLKF &&other ) noexcept
-    {
-#ifdef DEBUG_KALMAN_CONSTRUCTORS
-        std::cout << "move assignment LKF" << std::endl;
-#endif
-        swap( *this, other );
-        return *this;
-    }
-
-#ifdef DEBUG_KALMAN_CONSTRUCTORS
-    ///
-    /// \brief Дестркутор
-    ///
-    virtual ~CKalmanLKF()
-    {
-        std::cout << "destructor LKF" << std::endl;
-    }
-#elif
-    virtual ~CKalmanLKF() = default; ///< Дестркутор
-#endif
-    ///
-    /// \brief Метод свапа
-    /// \param lhs - left hand side instance
-    /// \param rhs - right hand side instance
-    ///
-    friend void swap( CKalmanLKF<SizeX, SizeY> &lhs, CKalmanLKF<SizeX, SizeY> &rhs ) noexcept
-    {
-        std::swap( lhs.SizeX_, rhs.SizeX_ );
-        std::swap( lhs.SizeY_, rhs.SizeY_ );
-
-        std::swap( lhs.F_, rhs.F_ );
-        std::swap( lhs.H_, rhs.H_ );
-
-        std::swap( lhs.K_, rhs.K_ );
-        std::swap( lhs.I_, rhs.I_ );
-        std::swap( lhs.DeltaY_, rhs.DeltaY_ );
-
-        std::swap( lhs.P_, rhs.P_ );
-        std::swap( lhs.S_, rhs.S_ );
-        std::swap( lhs.Q_, rhs.Q_ );
-        std::swap( lhs.R_, rhs.R_ );
-
-        std::swap( lhs.X_pred_, rhs.X_pred_ );
-        std::swap( lhs.Y_pred_, rhs.Y_pred_ );
-        std::swap( lhs.X_est_, rhs.X_est_ );
-        std::swap( lhs.Y_est_, rhs.Y_est_ );
-        std::swap( lhs.Y_msd_, rhs.Y_msd_ );
-
-        std::swap( lhs.deltaY_isSet, rhs.deltaY_isSet );
-        std::swap( lhs.Y_msd_isSet, rhs.Y_msd_isSet );
-        std::swap( lhs.prediction_isDone, rhs.prediction_isDone );
-    }
+    CKalmanLKF( const CKalmanLKF& ) = default;
+    CKalmanLKF& operator=( const CKalmanLKF& ) = default;
+    CKalmanLKF( CKalmanLKF&& ) = default;
+    CKalmanLKF& operator=( CKalmanLKF&& ) = default;
+    virtual ~CKalmanLKF() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы-сеттеры:
@@ -729,6 +589,7 @@ private:
     /// \param X - вектор состояния с прошлого момента времени
     ///
     std::function<arma::mat( double dt )> stateTransitionJacobianLinearF_;
+
 };
 
 }

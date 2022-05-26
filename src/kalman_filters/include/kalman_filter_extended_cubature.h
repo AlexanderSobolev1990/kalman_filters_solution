@@ -44,57 +44,6 @@ public:
 #endif
     }
 
-    ///
-    /// \brief Конструктор копирования
-    /// \param other - экземпляр, с которого делается копия
-    ///
-    CKalmanECKF( const CKalmanECKF &other ) : CKalmanEKF<SizeX, SizeY>( other ), CKalmanCKF<SizeX, SizeY>( other )
-    {}
-
-    ///
-    /// \brief Перегрузка оператора присвоения
-    /// \param other - экземпляр, с которого делается копия
-    /// \return *this
-    ///
-    CKalmanECKF& operator=( const CKalmanECKF &other )
-    {
-        CKalmanECKF copy( other );
-        swap( *this, copy );
-        return *this;
-    }
-
-    ///
-    /// \brief Конструктор перемещения
-    /// \param other - экземпляр, с которого делается копия
-    ///
-    CKalmanECKF( CKalmanECKF &&other ) noexcept
-    {
-        swap( *this, other );
-    }
-
-    ///
-    /// \brief Перегрузка оператора перемещения
-    /// \param other - экземпляр, с которого делается копия
-    /// \return *this
-    ///
-    CKalmanECKF& operator=( CKalmanECKF &&other ) noexcept
-    {
-        swap( *this, other );
-        return *this;
-    }
-
-    virtual ~CKalmanECKF() = default; ///< Дестркутор
-
-    ///
-    /// \brief Метод свапа
-    /// \param lhs - left hand side instance
-    /// \param rhs - right hand side instance
-    ///
-    friend void swap( CKalmanECKF<SizeX, SizeY> &lhs, CKalmanECKF<SizeX, SizeY> &rhs ) noexcept
-    {
-        swap( dynamic_cast< CKalmanCKF<SizeX, SizeY> &>( lhs ), dynamic_cast< CKalmanCKF<SizeX, SizeY> &>( rhs ) ); // Свап предка 1 порядка
-    }
-
     //------------------------------------------------------------------------------------------------------------------
     // Методы-сеттеры:
 

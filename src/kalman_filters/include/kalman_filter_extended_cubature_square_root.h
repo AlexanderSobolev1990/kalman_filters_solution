@@ -49,58 +49,6 @@ public:
 #endif
     }
 
-    ///
-    /// \brief Конструктор копирования
-    /// \param other - экземпляр, с которого делается копия
-    ///
-    CKalmanSRECKF( const CKalmanSRECKF &other ) : CKalmanEKF<SizeX, SizeY>( other ), CKalmanCKF<SizeX, SizeY>( other )
-    {}
-
-    ///
-    /// \brief Перегрузка оператора присвоения
-    /// \param other - экземпляр, с которого делается копия
-    /// \return *this
-    ///
-    CKalmanSRECKF& operator=( const CKalmanSRECKF &other )
-    {
-        CKalmanSRECKF copy( other );
-        swap( *this, copy );
-        return *this;
-    }
-
-    ///
-    /// \brief Конструктор перемещения
-    /// \param other - экземпляр, с которого делается копия
-    ///
-    CKalmanSRECKF( CKalmanSRECKF &&other ) noexcept
-    {
-        swap( *this, other );
-    }
-
-    ///
-    /// \brief Перегрузка оператора перемещения
-    /// \param other - экземпляр, с которого делается копия
-    /// \return *this
-    ///
-    CKalmanSRECKF& operator=( CKalmanSRECKF &&other ) noexcept
-    {
-        swap( *this, other );
-        return *this;
-    }
-
-    virtual ~CKalmanSRECKF() = default; ///< Дестркутор
-
-    ///
-    /// \brief Метод свапа
-    /// \param lhs - left hand side instance
-    /// \param rhs - right hand side instance
-    ///
-    friend void swap( CKalmanSRECKF<SizeX, SizeY> &lhs, CKalmanSRECKF<SizeX, SizeY> &rhs ) noexcept
-    {
-        swap( dynamic_cast< CKalmanEKF<SizeX, SizeY> &>( lhs ), dynamic_cast< CKalmanEKF<SizeX, SizeY> &>( rhs ) ); // Свап предка 1 порядка
-        swap( dynamic_cast< CKalmanCKF<SizeX, SizeY> &>( lhs ), dynamic_cast< CKalmanCKF<SizeX, SizeY> &>( rhs ) ); // Свап предка 1 порядка
-    }
-
     //------------------------------------------------------------------------------------------------------------------
     // Методы прогноза и коррекции:
 
@@ -168,58 +116,6 @@ public:
 #ifdef DEBUG_KALMAN
         this->SetFilterName( "SRECKFB" );
 #endif
-    }
-
-    ///
-    /// \brief Конструктор копирования
-    /// \param other - экземпляр, с которого делается копия
-    ///
-    CKalmanSRECKFB( const CKalmanSRECKFB &other ) : CKalmanEKF<SizeX, SizeY>( other ), CKalmanCKF<SizeX, SizeY>( other )
-    {}
-
-    ///
-    /// \brief Перегрузка оператора присвоения
-    /// \param other - экземпляр, с которого делается копия
-    /// \return *this
-    ///
-    CKalmanSRECKFB& operator=( const CKalmanSRECKFB &other )
-    {
-        CKalmanSRECKFB copy( other );
-        swap( *this, copy );
-        return *this;
-    }
-
-    ///
-    /// \brief Конструктор перемещения
-    /// \param other - экземпляр, с которого делается копия
-    ///
-    CKalmanSRECKFB( CKalmanSRECKFB &&other ) noexcept
-    {
-        swap( *this, other );
-    }
-
-    ///
-    /// \brief Перегрузка оператора перемещения
-    /// \param other - экземпляр, с которого делается копия
-    /// \return *this
-    ///
-    CKalmanSRECKFB& operator=( CKalmanSRECKFB &&other ) noexcept
-    {
-        swap( *this, other );
-        return *this;
-    }
-
-    virtual ~CKalmanSRECKFB() = default; ///< Дестркутор
-
-    ///
-    /// \brief Метод свапа
-    /// \param lhs - left hand side instance
-    /// \param rhs - right hand side instance
-    ///
-    friend void swap( CKalmanSRECKFB<SizeX, SizeY> &lhs, CKalmanSRECKFB<SizeX, SizeY> &rhs ) noexcept
-    {
-        swap( dynamic_cast< CKalmanEKF<SizeX, SizeY> &>( lhs ), dynamic_cast< CKalmanEKF<SizeX, SizeY> &>( rhs ) ); // Свап предка 1 порядка
-        swap( dynamic_cast< CKalmanCKF<SizeX, SizeY> &>( lhs ), dynamic_cast< CKalmanCKF<SizeX, SizeY> &>( rhs ) ); // Свап предка 1 порядка
     }
 
     //------------------------------------------------------------------------------------------------------------------

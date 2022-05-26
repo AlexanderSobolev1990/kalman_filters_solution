@@ -69,67 +69,6 @@ public:
         createSignMatrices();
     }
 
-    ///
-    /// \brief Конструктор копирования
-    /// \param other - экземпляр, с которого делается копия
-    ///
-    CKalmanSRUKF( const CKalmanSRUKF &other ) : CKalmanEKF<SizeX, SizeY>( other ), CKalmanUKF<SizeX, SizeY>( other )
-    {
-        this->J_ = other.J_;
-        this->Jpredict_ = other.Jpredict_;
-        this->Jcorrect_ = other.Jcorrect_;
-        this->negativeZeroCovWeight_ = other.negativeZeroCovWeight_;
-    }
-
-    ///
-    /// \brief Перегрузка оператора присвоения
-    /// \param other - экземпляр, с которого делается копия
-    /// \return *this
-    ///
-    CKalmanSRUKF& operator=( const CKalmanSRUKF &other )
-    {
-        CKalmanSRUKF copy( other );
-        swap( *this, copy );
-        return *this;
-    }
-
-    ///
-    /// \brief Конструктор перемещения
-    /// \param other - экземпляр, с которого делается копия
-    ///
-    CKalmanSRUKF( CKalmanSRUKF &&other ) noexcept
-    {
-        swap( *this, other );
-    }
-
-    ///
-    /// \brief Перегрузка оператора перемещения
-    /// \param other - экземпляр, с которого делается копия
-    /// \return *this
-    ///
-    CKalmanSRUKF& operator=( CKalmanSRUKF &&other ) noexcept
-    {
-        swap( *this, other );
-        return *this;
-    }
-
-    virtual ~CKalmanSRUKF() = default; ///< Дестркутор
-
-    ///
-    /// \brief Метод свапа
-    /// \param lhs - left hand side instance
-    /// \param rhs - right hand side instance
-    ///
-    friend void swap( CKalmanSRUKF<SizeX, SizeY> &lhs, CKalmanSRUKF<SizeX, SizeY> &rhs ) noexcept
-    {
-        swap( dynamic_cast< CKalmanUKF<SizeX, SizeY> &>( lhs ), dynamic_cast< CKalmanUKF<SizeX, SizeY> &>( rhs ) ); // Свап предка 1 порядка
-
-        std::swap( lhs.J_, rhs.J_ );
-        std::swap( lhs.Jpredict_, rhs.Jpredict_ );
-        std::swap( lhs.Jcorrect_, rhs.Jcorrect_ );
-        std::swap( lhs.negativeZeroCovWeight_, rhs.negativeZeroCovWeight_ );
-    }
-
     //------------------------------------------------------------------------------------------------------------------
     // Методы-сеттеры:
 
@@ -626,61 +565,6 @@ public:
         this->SetFilterName( "SRUKFB" );
 #endif
         createSignMatricesBlock();
-    }
-
-    ///
-    /// \brief Конструктор копирования
-    /// \param other - экземпляр, с которого делается копия
-    ///
-    CKalmanSRUKFB( const CKalmanSRUKFB &other ) : CKalmanSRUKF<SizeX, SizeY>( other )
-    {
-        this->JcorrectBlock_ = other.JcorrectBlock_;
-    }
-
-    ///
-    /// \brief Перегрузка оператора присвоения
-    /// \param other - экземпляр, с которого делается копия
-    /// \return *this
-    ///
-    CKalmanSRUKFB& operator=( const CKalmanSRUKFB &other )
-    {
-        CKalmanSRUKFB copy( other );
-        swap( *this, copy );
-        return *this;
-    }
-
-    ///
-    /// \brief Конструктор перемещения
-    /// \param other - экземпляр, с которого делается копия
-    ///
-    CKalmanSRUKFB( CKalmanSRUKFB &&other ) noexcept
-    {
-        swap( *this, other );
-    }
-
-    ///
-    /// \brief Перегрузка оператора перемещения
-    /// \param other - экземпляр, с которого делается копия
-    /// \return *this
-    ///
-    CKalmanSRUKFB& operator=( CKalmanSRUKFB &&other ) noexcept
-    {
-        swap( *this, other );
-        return *this;
-    }
-
-    virtual ~CKalmanSRUKFB() = default; ///< Дестркутор
-
-    ///
-    /// \brief Метод свапа
-    /// \param lhs - left hand side instance
-    /// \param rhs - right hand side instance
-    ///
-    friend void swap( CKalmanSRUKFB &lhs, CKalmanSRUKFB &rhs ) noexcept
-    {
-        swap( dynamic_cast<CKalmanSRUKF<SizeX, SizeY>&>( lhs ), dynamic_cast<CKalmanSRUKF<SizeX, SizeY>&>( rhs ) ); // Свап предка 1 порядка
-
-        std::swap( lhs.JcorrectBlock_, rhs.JcorrectBlock_ );
     }
 
     //------------------------------------------------------------------------------------------------------------------

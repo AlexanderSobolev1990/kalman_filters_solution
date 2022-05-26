@@ -30,7 +30,6 @@ namespace KalmanFilters /// Фильтры Калмана
 /// \tparam SizeY - размерность пространства измерений Y
 ///
 template<size_t SizeX, size_t SizeY>
-//class CKalmanSREKF : virtual public CKalmanEKF<SizeX, SizeY>
 class CKalmanSREKF : virtual public CKalmanEKF<SizeX, SizeY>
 {
 public:
@@ -46,57 +45,6 @@ public:
 #ifdef DEBUG_KALMAN
         this->SetFilterName( "SREKF" );
 #endif
-    }
-
-    ///
-    /// \brief Конструктор копирования
-    /// \param other - экземпляр, с которого делается копия
-    ///
-    CKalmanSREKF( const CKalmanSREKF &other ) : CKalmanEKF<SizeX, SizeY>( other )
-    {}
-
-    ///
-    /// \brief Перегрузка оператора присвоения
-    /// \param other - экземпляр, с которого делается копия
-    /// \return *this
-    ///
-    CKalmanSREKF& operator=( const CKalmanSREKF &other )
-    {
-        CKalmanSREKF copy( other );
-        swap( *this, copy );
-        return *this;
-    }
-
-    ///
-    /// \brief Конструктор перемещения
-    /// \param other - экземпляр, с которого делается копия
-    ///
-    CKalmanSREKF( CKalmanSREKF &&other ) noexcept
-    {
-        swap( *this, other );
-    }
-
-    ///
-    /// \brief Перегрузка оператора перемещения
-    /// \param other - экземпляр, с которого делается копия
-    /// \return *this
-    ///
-    CKalmanSREKF& operator=( CKalmanSREKF &&other ) noexcept
-    {
-        swap( *this, other );
-        return *this;
-    }
-
-    virtual ~CKalmanSREKF() = default; ///< Дестркутор
-
-    ///
-    /// \brief Метод свапа
-    /// \param lhs - left hand side instance
-    /// \param rhs - right hand side instance
-    ///
-    friend void swap( CKalmanSREKF &lhs, CKalmanSREKF &rhs ) noexcept
-    {
-        swap( dynamic_cast<CKalmanEKF<SizeX, SizeY>&>( lhs ), dynamic_cast<CKalmanEKF<SizeX, SizeY>&>( rhs ) ); // Свап предка 1 порядка
     }
 
     //------------------------------------------------------------------------------------------------------------------

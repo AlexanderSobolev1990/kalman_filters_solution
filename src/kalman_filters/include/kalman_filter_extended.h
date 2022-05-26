@@ -44,66 +44,7 @@ public:
 #endif
     }
 
-    ///
-    /// \brief Конструктор копирования
-    /// \param other - экземпляр, с которого делается копия
-    ///
-    CKalmanEKF( const CKalmanEKF &other ) : CKalmanLKF<SizeX, SizeY>( other )
-    {
-        this->stateTransitionModel_ = other.stateTransitionModel_;
-        this->observationModel_ = other.observationModel_;
-        this->stateTransitionJacobianF_ = other.stateTransitionJacobianF_;
-        this->observationJacobianH_ = other.observationJacobianH_;
-    }
-
-    ///
-    /// \brief Перегрузка оператора присвоения
-    /// \param other - экземпляр, с которого делается копия
-    /// \return *this
-    ///
-    CKalmanEKF& operator=( const CKalmanEKF &other )
-    {
-        CKalmanEKF copy( other );
-        swap( *this, copy );
-        return *this;
-    }
-
-    ///
-    /// \brief Конструктор перемещения
-    /// \param other - экземпляр, с которого делается копия
-    ///
-    CKalmanEKF( CKalmanEKF &&other ) noexcept
-    {
-        swap( *this, other );
-    }
-
-    ///
-    /// \brief Перегрузка оператора перемещения
-    /// \param other - экземпляр, с которого делается копия
-    /// \return *this
-    ///
-    CKalmanEKF& operator=( CKalmanEKF &&other ) noexcept
-    {
-        swap( *this, other );
-        return *this;
-    }
-
-    virtual ~CKalmanEKF() = default; ///< Дестркутор
-
-    ///
-    /// \brief Метод свапа
-    /// \param lhs - left hand side instance
-    /// \param rhs - right hand side instance
-    ///
-    friend void swap( CKalmanEKF<SizeX, SizeY> &lhs, CKalmanEKF<SizeX, SizeY> &rhs ) noexcept
-    {
-        swap( dynamic_cast< CKalmanLKF<SizeX, SizeY> &>( lhs ), dynamic_cast< CKalmanLKF<SizeX, SizeY> &>( rhs ) ); // Свап предка 1 порядка
-
-        std::swap( lhs.stateTransitionModel_, rhs.stateTransitionModel_ );
-        std::swap( lhs.observationModel_, rhs.observationModel_ );
-        std::swap( lhs.stateTransitionJacobianF_, rhs.stateTransitionJacobianF_ );
-        std::swap( lhs.observationJacobianH_, rhs.observationJacobianH_ );
-    }
+    virtual ~CKalmanEKF() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы-сеттеры:
