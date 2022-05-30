@@ -16,7 +16,6 @@
 #include <map>
 #include <matplotlibcpp.h>
 
-//#include <compare.h>
 #include <kalman_filter_linear.h>
 #include <kalman_filter_unscented.h>
 #include <kalman_filter_extended_unscented_square_root.h>
