@@ -2648,6 +2648,10 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
 */
     std::string filters_names = "COMPARE_EKF";
 
+    if( std::count( settings.Filters.begin(), settings.Filters.end(), "SRUKF2" ) ) {
+        filters_names += "_SRUKF2";
+    }
+
     if( std::count( settings.Filters.begin(), settings.Filters.end(), "SRUKF" ) ) {
         filters_names += "_SRUKF";
     }
@@ -2709,6 +2713,7 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
 //    std::map<std::string, arma::mat> RMSE_EKF = template_map_X;
 
     arma::mat RMSE_X_EKF = template_mat_X;
+    arma::mat RMSE_X_SRUKF2 = template_mat_X;
     std::map<std::string, arma::mat> RMSE_X_SRUKF;
     std::map<std::string, arma::mat> RMSE_X_SREUKF;
 
@@ -2772,6 +2777,22 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
     EKF.SetProcessCovarianceMatrixQdiag( Q );
     EKF.SetObservationCovarianceMatrixRdiag( R );
     //------------------------------------------------------------------------------------------------------------------
+    KalmanFilters::CKalmanSRUKF2<SizeX, SizeY> SRUKF2;
+    SRUKF2.SetStateTransitionModel( stateTransitionModel );
+    SRUKF2.SetObservationModel( observationModel );
+
+    SRUKF2.SetCheckBordersStateAfterPrediction( checkBordersState );
+    SRUKF2.SetCheckBordersStateAfterCorrection( checkBordersState );
+    SRUKF2.SetCheckBordersMeasurement( checkBordersMeasurement );
+    SRUKF2.SetCheckDeltaState( checkDeltaState );
+    SRUKF2.SetCheckDeltaMeasurement( checkDeltaMeasurement );
+
+    SRUKF2.SetWeightedSumStateSigmas( weightedSumStateSigmas );
+    SRUKF2.SetWeightedSumMeasurementSigmas( weightedSumMeasurementSigmas );
+
+    SRUKF2.SetProcessCovarianceMatrixQdiag( arma::sqrt( Q ) );
+    SRUKF2.SetObservationCovarianceMatrixRdiag( arma::sqrt( R ) );
+    //------------------------------------------------------------------------------------------------------------------
     std::map<std::string, KalmanFilters::CKalmanSRUKF<SizeX, SizeY>> filtersSRUKF;
     KalmanFilters::CKalmanSRUKF<SizeX, SizeY> SRUKF;
     SRUKF.SetStateTransitionModel( stateTransitionModel );
@@ -2812,6 +2833,7 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
         filters_names += "_Julier";
         for( unsigned long long i = 0; i < settings.w0_sr.size(); i++ ) {
             SRUKF.SetupDesignParametersMeanSet( settings.w0_sr[i] );
+            SRUKF2.SetupDesignParametersMeanSet( settings.w0_sr[i] );
             SREUKF.SetupDesignParametersMeanSet( settings.w0_sr[i] );
 
             std::string key = "w0=" + std::to_string( settings.w0_sr[i] );
@@ -2828,6 +2850,7 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
         for( unsigned long long b = 0; b < settings.beta_sr.size(); b++ )
         for( unsigned long long k = 0; k < settings.kappa_sr.size(); k++ ) {
             SRUKF.SetupDesignParametersScaledSet( settings.alpha_sr[a], settings.beta_sr[b], settings.kappa_sr[k] );
+            SRUKF2.SetupDesignParametersScaledSet( settings.alpha_sr[a], settings.beta_sr[b], settings.kappa_sr[k] );
             SREUKF.SetupDesignParametersScaledSet( settings.alpha_sr[a], settings.beta_sr[b], settings.kappa_sr[k] );
 
             std::string key = "a_b_k=" +
@@ -2849,8 +2872,8 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
     //------------------------------------------------------------------------------------------------------------------
 
     std::string name_dt = "_dt_" + std::to_string( settings.DeltaT );
-
-    int cycle_max = settings.MCruns * N * ( 1.0 + filtersSRUKF.size() + filtersSREUKF.size() );
+                                         //EKF                                              //SRUKF2
+    int cycle_max = settings.MCruns * N * ( 1 + filtersSRUKF.size() + filtersSREUKF.size() + 1 );
     int cycle = 0;
     int prev_percent = -1;
 
@@ -2918,6 +2941,24 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
 //        RMSE_X.at("EKF").col(0) += arma::square( checkDeltaState( startX - true_X.col(0) ) );
         RMSE_X_EKF.col(0) += arma::square( checkDeltaState( startX - true_X.col(0) ) );
         //--------------------------------------------------------------------------------------------------------------
+        // SRUKF2
+        SRUKF2.SetEstimatedVectorX( startX );
+        SRUKF2.SetEstimatedVectorY( startY );
+        SRUKF2.SetMeasuredVectorY( measured_Y.col(0) );
+        SRUKF2.SetDeltaY( deltaY );
+
+        arma::mat PdenseSRUKF2 = arma::mat( SizeX, SizeX );
+        PdenseSRUKF2.fill( 1.0e-9 );
+        PdenseSRUKF2.diag() = startP;
+        PdenseSRUKF2 = arma::chol( PdenseSRUKF2, "lower" );
+        SRUKF2.SetEstimateCovarianceMatrixP( PdenseSRUKF2 );
+        if( settings.Debug ) {
+            PdenseSRUKF2.print("PdenseSRUKF2:");
+        }
+//        RMSE_X.at("EKF").col(0) += arma::square( checkDeltaState( startX - true_X.col(0) ) );
+        RMSE_X_SRUKF2.col(0) += arma::square( checkDeltaState( startX - true_X.col(0) ) );
+
+        //--------------------------------------------------------------------------------------------------------------
         // MAP OF SRUKF
         if( std::count( settings.Filters.begin(), settings.Filters.end(), "SRUKF" ) ) {
             for( auto &item : filtersSRUKF ) {
@@ -2979,6 +3020,7 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
 
             // Прогноз
             EKF.Prediction( settings.DeltaT );
+            SRUKF2.Prediction( settings.DeltaT );
 
             if( std::count( settings.Filters.begin(), settings.Filters.end(), "SRUKF" ) ) {
                 for( auto &item : filtersSRUKF ) {
@@ -3017,6 +3059,7 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
 
             // Коррекция
             EKF.Correction( measured_Y.col(i) );
+            SRUKF2.Correction( measured_Y.col(i) );
             cycle++;
             print_percent( cycle, cycle_max, prev_percent ); // Напечатать проценты выполнения
 
@@ -3041,6 +3084,7 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
 
             // RMSE
             RMSE_X_EKF.col(i) += arma::square( checkDeltaState( EKF.GetEstimatedVectorX() - true_X.col(i) ) );
+            RMSE_X_SRUKF2.col(i) += arma::square( checkDeltaState( SRUKF2.GetEstimatedVectorX() - true_X.col(i) ) );
             if( std::count( settings.Filters.begin(), settings.Filters.end(), "SRUKF" ) ) {
                 for( auto &item : filtersSRUKF ) {
                     auto &key = item.first;
@@ -3074,6 +3118,9 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
 
     RMSE_X_EKF *= ( 1.0 / static_cast<double>( settings.MCruns ) );
     RMSE_X_EKF = arma::sqrt( RMSE_X_EKF );
+
+    RMSE_X_SRUKF2 *= ( 1.0 / static_cast<double>( settings.MCruns ) );
+    RMSE_X_SRUKF2 = arma::sqrt( RMSE_X_SRUKF2 );
 
     if( std::count( settings.Filters.begin(), settings.Filters.end(), "SRUKF" ) ) {
         for( auto &item : filtersSRUKF ) {
@@ -3111,8 +3158,13 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
             stream << std::hex << color;
             std::string color_hex_string = "#00" + stream.str() + "00"; // GREEN
 
-            plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF.at( key ).row(0) ),
-                { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", key } } );
+            if( filtersSRUKF.size() > 1 ) {
+                plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF.at( key ).row(0) ),
+                    { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", key } } );
+            } else {
+                plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF.at( key ).row(0) ),
+                    { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "SRUKF" } } );
+            }
             i++;
         }
     }
@@ -3127,15 +3179,26 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
             stream << std::hex << color;
             std::string color_hex_string = "#" + stream.str() + "0000"; // RED
 
-            plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SREUKF.at( key ).row(0) ), //estimated_keywords.at( key ) );
-                { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", key } } );
+            if( filtersSREUKF.size() > 1 ) {
+                plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SREUKF.at( key ).row(0) ), //estimated_keywords.at( key ) );
+                    { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", key } } );
+            } else {
+                plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SREUKF.at( key ).row(0) ), //estimated_keywords.at( key ) );
+                    { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "SREUKF" } } );
+            }
             i++;
         }
     }
     plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_EKF.row(0) ), //estimated_keywords.at( filter ) );
-        { { "color", "blue" }, { "linestyle", "-" }, { "linewidth", "1" } } );
+        { { "color", "blue" }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "EKF" } } );
 
-//    plt::legend( legend_loc );
+    if( std::count( settings.Filters.begin(), settings.Filters.end(), "SRUKF2" ) ) {
+        plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF2.row(0) ), //estimated_keywords.at( filter ) );
+            { { "color", "red" }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "SRUKF2" } } );
+    }
+
+    plt::legend( legend_loc );
+
     plt::grid( true );
     plt::xlim( 0.0, settings.SimulationTime );
     if( ylim_yes ) {
@@ -3166,8 +3229,13 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
             stream << std::hex << color;
             std::string color_hex_string = "#00" + stream.str() + "00"; // GREEN
 
-            plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF.at( key ).row(1) ), //estimated_keywords.at( key ) );
-                { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", key } } );
+            if( filtersSRUKF.size() > 1 ) {
+                plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF.at( key ).row(1) ), //estimated_keywords.at( key ) );
+                    { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", key } } );
+            } else {
+                plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF.at( key ).row(1) ), //estimated_keywords.at( key ) );
+                    { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "SRUKF" } } );
+            }
             i++;
         }
     }
@@ -3181,15 +3249,25 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
             std::stringstream stream;
             stream << std::hex << color;
             std::string color_hex_string = "#" + stream.str() + "0000"; // RED
-
-            plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SREUKF.at( key ).row(1) ), //estimated_keywords.at( key ) );
-                { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", key } } );
+            if( filtersSREUKF.size() > 1 ) {
+                plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SREUKF.at( key ).row(1) ), //estimated_keywords.at( key ) );
+                    { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", key } } );
+            } else {
+                plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SREUKF.at( key ).row(1) ), //estimated_keywords.at( key ) );
+                    { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "SREUKF" } } );
+            }
             i++;
         }
     }
     plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_EKF.row(1) ), //estimated_keywords.at( filter ) );
-        { { "color", "blue" }, { "linestyle", "-" }, { "linewidth", "1" } } );
-//    plt::legend( legend_loc );
+        { { "color", "blue" }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "EKF" } } );
+    if( std::count( settings.Filters.begin(), settings.Filters.end(), "SRUKF2" ) ) {
+        plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF2.row(1) ), //estimated_keywords.at( filter ) );
+            { { "color", "red" }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "SRUKF2" } } );
+    }
+
+    plt::legend( legend_loc );
+
     plt::grid( true );
     plt::xlim( 0.0, settings.SimulationTime );
     if( ylim_yes ) {
@@ -3220,8 +3298,13 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
             stream << std::hex << color;
             std::string color_hex_string = "#00" + stream.str() + "00"; // GREEN
 
-            plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF.at( key ).row(2) ), //estimated_keywords.at( key ) );
-                { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", key } } );
+            if( filtersSRUKF.size() > 1 ) {
+                plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF.at( key ).row(2) ), //estimated_keywords.at( key ) );
+                    { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", key } } );
+            } else {
+                plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF.at( key ).row(2) ), //estimated_keywords.at( key ) );
+                    { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "SRUKF" } } );
+            }
             i++;
         }
     }
@@ -3236,14 +3319,25 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
             stream << std::hex << color;
             std::string color_hex_string = "#" + stream.str() + "0000"; // RED
 
-            plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SREUKF.at( key ).row(2) ), //estimated_keywords.at( key ) );
-                { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", key } } );
+            if( filtersSREUKF.size() > 1 ) {
+                plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SREUKF.at( key ).row(2) ), //estimated_keywords.at( key ) );
+                    { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", key } } );
+            } else {
+                plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SREUKF.at( key ).row(2) ), //estimated_keywords.at( key ) );
+                    { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "SREUKF" } } );
+            }
             i++;
         }
     }
     plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_EKF.row(2) ), //estimated_keywords.at( filter ) );
-        { { "color", "blue" }, { "linestyle", "-" }, { "linewidth", "1" } } );
-//    plt::legend( legend_loc );
+        { { "color", "blue" }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "EKF" } } );
+    if( std::count( settings.Filters.begin(), settings.Filters.end(), "SRUKF2" ) ) {
+        plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF2.row(2) ), //estimated_keywords.at( filter ) );
+            { { "color", "red" }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "SRUKF2" } } );
+    }
+
+    plt::legend( legend_loc );
+
     plt::grid( true );
     plt::xlim( 0.0, settings.SimulationTime );
     if( ylim_yes ) {
@@ -3274,8 +3368,13 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
             stream << std::hex << color;
             std::string color_hex_string = "#00" + stream.str() + "00"; // GREEN
 
-            plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF.at( key ).row(3) ), //estimated_keywords.at( key ) );
-                { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", key } } );
+            if( filtersSRUKF.size() > 1 ) {
+                plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF.at( key ).row(3) ), //estimated_keywords.at( key ) );
+                    { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", key } } );
+            } else {
+                plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF.at( key ).row(3) ), //estimated_keywords.at( key ) );
+                    { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "SRUKF" } } );
+            }
             i++;
         }
     }
@@ -3290,14 +3389,25 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
             stream << std::hex << color;
             std::string color_hex_string = "#" + stream.str() + "0000"; // RED
 
-            plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SREUKF.at( key ).row(3) ), //estimated_keywords.at( key ) );
-                { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", key } } );
+            if( filtersSREUKF.size() > 1 ) {
+                plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SREUKF.at( key ).row(3) ), //estimated_keywords.at( key ) );
+                    { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", key } } );
+            } else {
+                plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SREUKF.at( key ).row(3) ), //estimated_keywords.at( key ) );
+                    { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "SREUKF" } } );
+            }
             i++;
         }
     }
     plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_EKF.row(3) ), //estimated_keywords.at( filter ) );
-        { { "color", "blue" }, { "linestyle", "-" }, { "linewidth", "1" } } );
-//    plt::legend( legend_loc );
+        { { "color", "blue" }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "EKF" } } );
+    if( std::count( settings.Filters.begin(), settings.Filters.end(), "SRUKF2" ) ) {
+        plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF2.row(3) ), //estimated_keywords.at( filter ) );
+            { { "color", "red" }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "SRUKF2" } } );
+    }
+
+    plt::legend( legend_loc );
+
     plt::grid( true );
     plt::xlim( 0.0, settings.SimulationTime );
     if( ylim_yes ) {
@@ -3328,8 +3438,13 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
             stream << std::hex << color;
             std::string color_hex_string = "#00" + stream.str() + "00"; // GREEN
 
-            plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF.at( key ).row(4) ), //estimated_keywords.at( key ) );
-                { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", key } } );
+            if( filtersSRUKF.size() > 1 ) {
+                plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF.at( key ).row(4) ), //estimated_keywords.at( key ) );
+                    { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", key } } );
+            } else {
+                plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF.at( key ).row(4) ), //estimated_keywords.at( key ) );
+                    { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "SRUKF" } } );
+            }
             i++;
         }
     }
@@ -3344,14 +3459,25 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
             stream << std::hex << color;
             std::string color_hex_string = "#" + stream.str() + "0000"; // RED
 
-            plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SREUKF.at( key ).row(4) ), //estimated_keywords.at( key ) );
-                { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", key } } );
+            if( filtersSREUKF.size() > 1 ) {
+                plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SREUKF.at( key ).row(4) ), //estimated_keywords.at( key ) );
+                    { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", key } } );
+            } else {
+                plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SREUKF.at( key ).row(4) ), //estimated_keywords.at( key ) );
+                    { { "color", color_hex_string }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "SREUKF" } } );
+            }
             i++;
         }
     }
     plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_EKF.row(4) ), //estimated_keywords.at( filter ) );
-        { { "color", "blue" }, { "linestyle", "-" }, { "linewidth", "1" } } );
-//    plt::legend( legend_loc );
+        { { "color", "blue" }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "EKF" } } );
+    if( std::count( settings.Filters.begin(), settings.Filters.end(), "SRUKF2" ) ) {
+        plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF2.row(4) ), //estimated_keywords.at( filter ) );
+            { { "color", "red" }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "SRUKF2" } } );
+    }
+
+    plt::legend( legend_loc );
+
     plt::grid( true) ;
     plt::xlim( 0.0, settings.SimulationTime );
     if( ylim_yes ) {

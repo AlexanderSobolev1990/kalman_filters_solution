@@ -542,6 +542,160 @@ protected:
 };
 
 //----------------------------------------------------------------------------------------------------------------------
+// Добавлен для сравнения с CKalmanSRUKF, подразумевающим пересоздание сигма-точек.
+template<size_t SizeX, size_t SizeY>
+class CKalmanSRUKF2 : public CKalmanSRUKF<SizeX, SizeY>
+{
+public:
+//    using CKalmanUKF<SizeX, SizeY>::CKalmanUKF;
+    //------------------------------------------------------------------------------------------------------------------
+    // Конструкторы:
+
+    ///
+    /// \brief Конструктор по умолчанию
+    ///
+    CKalmanSRUKF2() : CKalmanSRUKF<SizeX, SizeY>()
+    {
+#ifdef DEBUG_KALMAN
+        this->SetFilterName( "SRUKF2" );
+#endif
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Методы прогноза и коррекции:
+
+    ///
+    /// \brief Прогноз
+    /// \param dt - Время прогноза, [с]
+    ///
+    virtual void Prediction( double dt )
+    {
+#ifdef DEBUG_KALMAN
+        std::cout << "-----------------------------------------------------------------------------------" << std::endl;
+        std::cout << this->filterName_ + " Prediction started, dt = " << dt << std::endl;
+#endif
+        assert( dt > 0.0 ); // Прогноз имеет смысл только при положительном времени
+
+        // 1. Создание сигма-точек пространства X
+#ifdef DEBUG_KALMAN
+        ( this->P_ ).print( this->filterName_ + " Prediction, P before:" );
+#endif
+        this->x_est_sigma_points_.col( this->k_sigma_points_ - 1 ) = this->X_est_; // Нулевая точка - сзади!
+        for( size_t i = 0; i < SizeX; i++ ) {
+            arma::vec add = ( this->gamma_ * this->P_.col(i) );
+            this->x_est_sigma_points_.col(i) = this->X_est_ + add;
+            this->x_est_sigma_points_.col(i + SizeX) = this->X_est_ - add;
+            if( this->checkBordersStateAfterPrediction_ != nullptr ) {
+                this->x_est_sigma_points_.col(i) = this->checkBordersStateAfterPrediction_( this->x_est_sigma_points_.col(i) );
+                this->x_est_sigma_points_.col(i + SizeX) = this->checkBordersStateAfterPrediction_( this->x_est_sigma_points_.col(i + SizeX) );
+            }
+        }
+#ifdef DEBUG_KALMAN
+        ( this->x_est_sigma_points_ ).print( this->filterName_ + " Prediction, x_est_sigma_points_:" );
+#endif
+        // 2. Прогноз сигма-точек пространства X на текущий такт
+        for( int i = 0; i < this->k_sigma_points_; i++ ) {
+            this->x_pred_sigma_points_.col(i) = this->stateTransitionModel_( this->x_est_sigma_points_.col(i), dt );
+        }
+#ifdef DEBUG_KALMAN
+        ( this->x_pred_sigma_points_ ).print( this->filterName_ + " Prediction, x_pred_sigma_points_:" );
+#endif
+        // 3. Вычисление X_pred по сигма-точкам пространства Х
+        if( this->weightedSumStateSigmas_ == nullptr ) {
+            this->X_pred_ = this->x_pred_sigma_points_ * this->weights_mean_; // В матричной форме
+        } else {
+            this->X_pred_ = this->weightedSumStateSigmas_( this->weights_mean_, this->x_pred_sigma_points_ );
+        }
+        if( this->checkBordersStateAfterPrediction_ != nullptr ) {
+            this->X_pred_ = this->checkBordersStateAfterPrediction_( this->X_pred_ );
+        }
+#ifdef DEBUG_KALMAN
+        ( this->X_pred_ ).print( this->filterName_ + " Prediction, X_pred_:" );
+#endif
+        // 4. Вычисление ковариационной матрицы Р
+        for( int i = 0; i < this->k_sigma_points_; i++ ) {
+            this->dXcal_.col(i) = ( this->x_pred_sigma_points_.col(i) - this->X_pred_ );
+            if( this->checkDeltaState_ != nullptr ) {
+                this->dXcal_.col(i) = this->checkDeltaState_( this->dXcal_.col(i) );
+            }
+            this->dXcal_.col(i) *= std::sqrt( std::abs( this->weights_covariance_(i) ) );
+        }
+        arma::mat Qdt = this->Q_ * std::sqrt( dt );
+        arma::mat JQR_input_P_pred = arma::trans( arma::join_horiz( Qdt, this->dXcal_ ) ); // JQR_input = [ Qdt, dXcal ], Транспонировать, т.к. в JQR разложение так надо
+#ifdef DEBUG_KALMAN
+        JQR_input_P_pred.print( this->filterName_ + " Prediction, JQR_input_P_pred:" );
+#endif
+        arma::mat Q_qr_P_pred, R_qr_P_pred, J_qr_P_pred;
+        int res_JQR_P_pred;
+        if( this->negativeZeroCovWeight_ ) {
+            res_JQR_P_pred = SPML::QR::J_orthogonal( Q_qr_P_pred, R_qr_P_pred, J_qr_P_pred, JQR_input_P_pred, this->Jpredict_, true ); // Вызов JQR разложения
+        } else {
+            res_JQR_P_pred = SPML::QR::ModifiedGramSchmidt( Q_qr_P_pred, R_qr_P_pred, JQR_input_P_pred ); // Вызов QR разложения
+        }
+        assert( res_JQR_P_pred == 0 );
+        this->P_ = arma::trans( R_qr_P_pred ); // Матрица Р считывается из транспонированной выходной матрицы R
+#ifdef DEBUG_KALMAN
+        J_qr_P_pred.print( this->filterName_ + " Prediction, J_qr_P_pred after:" );
+        Q_qr_P_pred.print( this->filterName_ + " Prediction, Q_qr_P_pred after:" );
+        ( this->P_ ).print( this->filterName_ + " Prediction, P after:" );
+        ( this->P_ * arma::trans( this->P_ ) ).print( this->filterName_ + " Prediction, Pfull after:" );
+#endif
+//        // 5. Пересоздание сигма-точек после прогноза по новой P
+//        this->x_pred_sigma_points_.col(this->k_sigma_points_ - 1) = this->X_pred_; // Нулевая точка - сзади!
+//        for( size_t i = 0; i < SizeX; i++ ) {
+//            arma::vec add = this->gamma_ * this->P_.col(i);
+//            this->x_pred_sigma_points_.col(i) = this->X_pred_ + add;
+//            this->x_pred_sigma_points_.col(i + SizeX) = this->X_pred_ - add;
+//            if( this->checkBordersStateAfterPrediction_ != nullptr ) {
+//                this->x_pred_sigma_points_.col(i) = this->checkBordersStateAfterPrediction_( this->x_pred_sigma_points_.col(i) );
+//                this->x_pred_sigma_points_.col(i + SizeX) = this->checkBordersStateAfterPrediction_( this->x_pred_sigma_points_.col(i + SizeX) );
+//            }
+//        }
+#ifdef DEBUG_KALMAN
+        ( this->x_pred_sigma_points_ ).print( this->filterName_ + " Prediction, x_pred_sigma_points_:" );
+#endif
+//        // 6. Вычисление X_pred заново по пересозданным сигма-точкам пространства Х (в [4] не указано, но это подразумевается)
+//        if( this->weightedSumStateSigmas_ == nullptr ) {
+//            this->X_pred_ = this->x_pred_sigma_points_ * this->weights_mean_; // В матричной форме
+//        } else {
+//            this->X_pred_ = this->weightedSumStateSigmas_( this->weights_mean_, this->x_pred_sigma_points_ );
+//        }
+//        if( this->checkBordersStateAfterPrediction_ != nullptr ) {
+//            this->X_pred_ = this->checkBordersStateAfterPrediction_( this->X_pred_ );
+//        }
+
+        // 7. Вычисление сигма-точек пространства Y
+        for( int i = 0; i < this->k_sigma_points_; i++ ) {
+            this->y_pred_sigma_points_.col(i) = this->observationModel_( this->x_pred_sigma_points_.col(i) );
+            if( this->checkBordersMeasurement_ != nullptr ) {
+                this->y_pred_sigma_points_.col(i) = this->checkBordersMeasurement_( this->y_pred_sigma_points_.col(i) );
+            }
+        }
+#ifdef DEBUG_KALMAN
+        ( this->y_pred_sigma_points_ ).print( this->filterName_ + " Prediction, y_pred_sigma_points_:" );
+#endif
+        // 8. Вычисление предсказанного вектора Y_pred на текущий такт по сигма-точкам пространства Х
+        if( this->weightedSumMeasurementSigmas_ == nullptr ) {
+            this->Y_pred_ = this->y_pred_sigma_points_ * this->weights_mean_; // В матричной форме
+        } else {
+            this->Y_pred_ = this->weightedSumMeasurementSigmas_( this->weights_mean_, this->y_pred_sigma_points_ );
+        }
+        if( this->checkBordersMeasurement_ != nullptr ) {
+            this->Y_pred_ = this->checkBordersMeasurement_( this->Y_pred_ );
+        }
+
+        // 9. Обновление X_est, Y_est
+        this->X_est_ = this->X_pred_;
+        this->Y_est_ = this->Y_pred_;
+#ifdef DEBUG_KALMAN
+        ( this->X_est_ ).print( this->filterName_ + " Prediction, X_est:" );
+        ( this->Y_est_ ).print( this->filterName_ + " Prediction, Y_est:" );
+#endif
+        this->prediction_isDone = true; // Выставить признак состоявшегося прогноза
+    }
+};
+
+//----------------------------------------------------------------------------------------------------------------------
 ///
 /// \brief Шаблонный класс квадратно-корневого сигма-точечного (ансцентного) фильтра Калмана (блочная фильтрация),
 /// КК-СТФКБ (КК-АФКБ) (Square Root Unscented Kalman Filter Block, SR-UKFB)
