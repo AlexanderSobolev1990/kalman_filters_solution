@@ -480,7 +480,8 @@ void CKalmanFiltersCompare::RunMain( const CSettings &settings )
         SRECKF.SetObservationCovarianceMatrixRdiag( arma::sqrt( R ) );
     }
     //------------------------------------------------------------------------------------------------------------------
-    KalmanFilters::CKalmanSRECKFB<SizeX, SizeY> SRECKFB;
+//    KalmanFilters::CKalmanSRECKFB<SizeX, SizeY> SRECKFB; // orig
+    KalmanFilters::CKalmanSRECKFBpure<SizeX, SizeY> SRECKFB; // new
     if( std::count( settings.Filters.begin(), settings.Filters.end(), "SRECKFB" ) ) {
         SRECKFB.SetStateTransitionModel( stateTransitionModel );
         SRECKFB.SetStateTransitionJacobianF( stateTransitionJacobianF );
