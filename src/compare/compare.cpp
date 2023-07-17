@@ -193,7 +193,7 @@ void CKalmanFiltersCompare::RunMain( const CSettings &settings )
             filters_names += "_";
         }
     }
-    std::map<std::string, std::string>legend_loc { { "loc", "upper right" } };
+    std::map<std::string, std::string>legend_loc{ { "loc", "upper right" } };
     std::map<std::string, std::string>legend_loc_time { { "loc", "upper left" } };
     std::string loc_time = "upper left";
 
@@ -2714,6 +2714,7 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
 
     arma::mat RMSE_X_EKF = template_mat_X;
     arma::mat RMSE_X_SRUKF2 = template_mat_X;
+    arma::mat RMSE_X_SRUKF3 = template_mat_X;
     std::map<std::string, arma::mat> RMSE_X_SRUKF;
     std::map<std::string, arma::mat> RMSE_X_SREUKF;
 
@@ -2755,6 +2756,13 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
         RMS_X_K * RMS_X_K,
         RMS_X_Ka * RMS_X_Ka
     };
+//    arma::vec Q = {
+//        0.0,
+//        0.0,
+//        0.0,
+//        0.0,
+//        0.0
+//    };
     // Диагональ матрицы шумов измерений:
     arma::vec R = {
         RMS_Y_R * RMS_Y_R,
@@ -2792,6 +2800,22 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
 
     SRUKF2.SetProcessCovarianceMatrixQdiag( arma::sqrt( Q ) );
     SRUKF2.SetObservationCovarianceMatrixRdiag( arma::sqrt( R ) );
+    //------------------------------------------------------------------------------------------------------------------
+    KalmanFilters::CKalmanSRUKF3<SizeX, SizeY> SRUKF3;
+    SRUKF3.SetStateTransitionModel( stateTransitionModel );
+    SRUKF3.SetObservationModel( observationModel );
+
+    SRUKF3.SetCheckBordersStateAfterPrediction( checkBordersState );
+    SRUKF3.SetCheckBordersStateAfterCorrection( checkBordersState );
+    SRUKF3.SetCheckBordersMeasurement( checkBordersMeasurement );
+    SRUKF3.SetCheckDeltaState( checkDeltaState );
+    SRUKF3.SetCheckDeltaMeasurement( checkDeltaMeasurement );
+
+    SRUKF3.SetWeightedSumStateSigmas( weightedSumStateSigmas );
+    SRUKF3.SetWeightedSumMeasurementSigmas( weightedSumMeasurementSigmas );
+
+    SRUKF3.SetProcessCovarianceMatrixQdiag( arma::sqrt( Q ) );
+    SRUKF3.SetObservationCovarianceMatrixRdiag( arma::sqrt( R ) );
     //------------------------------------------------------------------------------------------------------------------
     std::map<std::string, KalmanFilters::CKalmanSRUKF<SizeX, SizeY>> filtersSRUKF;
     KalmanFilters::CKalmanSRUKF<SizeX, SizeY> SRUKF;
@@ -2834,6 +2858,7 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
         for( unsigned long long i = 0; i < settings.w0_sr.size(); i++ ) {
             SRUKF.SetupDesignParametersMeanSet( settings.w0_sr[i] );
             SRUKF2.SetupDesignParametersMeanSet( settings.w0_sr[i] );
+            SRUKF3.SetupDesignParametersMeanSet( settings.w0_sr[i] );
             SREUKF.SetupDesignParametersMeanSet( settings.w0_sr[i] );
 
             std::string key = "w0=" + std::to_string( settings.w0_sr[i] );
@@ -2851,6 +2876,7 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
         for( unsigned long long k = 0; k < settings.kappa_sr.size(); k++ ) {
             SRUKF.SetupDesignParametersScaledSet( settings.alpha_sr[a], settings.beta_sr[b], settings.kappa_sr[k] );
             SRUKF2.SetupDesignParametersScaledSet( settings.alpha_sr[a], settings.beta_sr[b], settings.kappa_sr[k] );
+            SRUKF3.SetupDesignParametersScaledSet( settings.alpha_sr[a], settings.beta_sr[b], settings.kappa_sr[k] );
             SREUKF.SetupDesignParametersScaledSet( settings.alpha_sr[a], settings.beta_sr[b], settings.kappa_sr[k] );
 
             std::string key = "a_b_k=" +
@@ -2957,7 +2983,23 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
         }
 //        RMSE_X.at("EKF").col(0) += arma::square( checkDeltaState( startX - true_X.col(0) ) );
         RMSE_X_SRUKF2.col(0) += arma::square( checkDeltaState( startX - true_X.col(0) ) );
+        //--------------------------------------------------------------------------------------------------------------
+        // SRUKF3
+        SRUKF3.SetEstimatedVectorX( startX );
+        SRUKF3.SetEstimatedVectorY( startY );
+        SRUKF3.SetMeasuredVectorY( measured_Y.col(0) );
+        SRUKF3.SetDeltaY( deltaY );
 
+        arma::mat PdenseSRUKF3 = arma::mat( SizeX, SizeX );
+        PdenseSRUKF3.fill( 1.0e-9 );
+        PdenseSRUKF3.diag() = startP;
+        PdenseSRUKF3 = arma::chol( PdenseSRUKF3, "lower" );
+        SRUKF3.SetEstimateCovarianceMatrixP( PdenseSRUKF3 );
+        if( settings.Debug ) {
+            PdenseSRUKF3.print("PdenseSRUKF3:");
+        }
+//        RMSE_X.at("EKF").col(0) += arma::square( checkDeltaState( startX - true_X.col(0) ) );
+        RMSE_X_SRUKF3.col(0) += arma::square( checkDeltaState( startX - true_X.col(0) ) );
         //--------------------------------------------------------------------------------------------------------------
         // MAP OF SRUKF
         if( std::count( settings.Filters.begin(), settings.Filters.end(), "SRUKF" ) ) {
@@ -3021,6 +3063,7 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
             // Прогноз
             EKF.Prediction( settings.DeltaT );
             SRUKF2.Prediction( settings.DeltaT );
+            SRUKF3.Prediction( settings.DeltaT );
 
             if( std::count( settings.Filters.begin(), settings.Filters.end(), "SRUKF" ) ) {
                 for( auto &item : filtersSRUKF ) {
@@ -3060,6 +3103,7 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
             // Коррекция
             EKF.Correction( measured_Y.col(i) );
             SRUKF2.Correction( measured_Y.col(i) );
+            SRUKF3.Correction( measured_Y.col(i) );
             cycle++;
             print_percent( cycle, cycle_max, prev_percent ); // Напечатать проценты выполнения
 
@@ -3085,6 +3129,7 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
             // RMSE
             RMSE_X_EKF.col(i) += arma::square( checkDeltaState( EKF.GetEstimatedVectorX() - true_X.col(i) ) );
             RMSE_X_SRUKF2.col(i) += arma::square( checkDeltaState( SRUKF2.GetEstimatedVectorX() - true_X.col(i) ) );
+            RMSE_X_SRUKF3.col(i) += arma::square( checkDeltaState( SRUKF3.GetEstimatedVectorX() - true_X.col(i) ) );
             if( std::count( settings.Filters.begin(), settings.Filters.end(), "SRUKF" ) ) {
                 for( auto &item : filtersSRUKF ) {
                     auto &key = item.first;
@@ -3121,6 +3166,9 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
 
     RMSE_X_SRUKF2 *= ( 1.0 / static_cast<double>( settings.MCruns ) );
     RMSE_X_SRUKF2 = arma::sqrt( RMSE_X_SRUKF2 );
+
+    RMSE_X_SRUKF3 *= ( 1.0 / static_cast<double>( settings.MCruns ) );
+    RMSE_X_SRUKF3 = arma::sqrt( RMSE_X_SRUKF3 );
 
     if( std::count( settings.Filters.begin(), settings.Filters.end(), "SRUKF" ) ) {
         for( auto &item : filtersSRUKF ) {
@@ -3196,6 +3244,10 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
         plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF2.row(0) ), //estimated_keywords.at( filter ) );
             { { "color", "red" }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "SRUKF2" } } );
     }
+    if( std::count( settings.Filters.begin(), settings.Filters.end(), "SRUKF3" ) ) {
+        plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF3.row(0) ), //estimated_keywords.at( filter ) );
+            { { "color", "purple" }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "SRUKF3" } } );
+    }
 
     plt::legend( legend_loc );
 
@@ -3264,6 +3316,10 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
     if( std::count( settings.Filters.begin(), settings.Filters.end(), "SRUKF2" ) ) {
         plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF2.row(1) ), //estimated_keywords.at( filter ) );
             { { "color", "red" }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "SRUKF2" } } );
+    }
+    if( std::count( settings.Filters.begin(), settings.Filters.end(), "SRUKF3" ) ) {
+        plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF3.row(1) ), //estimated_keywords.at( filter ) );
+            { { "color", "purple" }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "SRUKF3" } } );
     }
 
     plt::legend( legend_loc );
@@ -3335,6 +3391,10 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
         plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF2.row(2) ), //estimated_keywords.at( filter ) );
             { { "color", "red" }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "SRUKF2" } } );
     }
+    if( std::count( settings.Filters.begin(), settings.Filters.end(), "SRUKF3" ) ) {
+        plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF3.row(2) ), //estimated_keywords.at( filter ) );
+            { { "color", "purple" }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "SRUKF3" } } );
+    }
 
     plt::legend( legend_loc );
 
@@ -3405,6 +3465,10 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
         plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF2.row(3) ), //estimated_keywords.at( filter ) );
             { { "color", "red" }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "SRUKF2" } } );
     }
+    if( std::count( settings.Filters.begin(), settings.Filters.end(), "SRUKF3" ) ) {
+        plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF3.row(3) ), //estimated_keywords.at( filter ) );
+            { { "color", "purple" }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "SRUKF3" } } );
+    }
 
     plt::legend( legend_loc );
 
@@ -3474,6 +3538,10 @@ void CKalmanFiltersCompare::Run_RMSE_EKF_SRUKF_SREUKF( const CSettings &settings
     if( std::count( settings.Filters.begin(), settings.Filters.end(), "SRUKF2" ) ) {
         plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF2.row(4) ), //estimated_keywords.at( filter ) );
             { { "color", "red" }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "SRUKF2" } } );
+    }
+    if( std::count( settings.Filters.begin(), settings.Filters.end(), "SRUKF3" ) ) {
+        plt::plot( time, arma::conv_to< std::vector<double> >::from( RMSE_X_SRUKF3.row(4) ), //estimated_keywords.at( filter ) );
+            { { "color", "purple" }, { "linestyle", "-" }, { "linewidth", "1" }, { "label", "SRUKF3" } } );
     }
 
     plt::legend( legend_loc );

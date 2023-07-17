@@ -221,7 +221,7 @@ int J_orthogonal( arma::mat &Q, arma::mat &R, arma::mat &J1, const arma::mat &A,
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-int ModifiedGramSchmidt(arma::mat &Q, arma::mat &R, const arma::mat &A )
+int ModifiedGramSchmidt( arma::mat &Q, arma::mat &R, const arma::mat &A )
 {
     int m = A.n_rows;
     int n = A.n_cols;
@@ -235,12 +235,30 @@ int ModifiedGramSchmidt(arma::mat &Q, arma::mat &R, const arma::mat &A )
         }
         R(k, k) = ( arma::norm( Q.col(k) ) );
         Q.col(k) = Q.col(k) / R(k, k);
-    }    
+    }
+    return 0;
+}
+
+int ModifiedGramSchmidtRowByRow( arma::mat &Q, arma::mat &R, const arma::mat &A )
+{
+    int m = A.n_rows;
+    int n = A.n_cols;
+    Q = A; //arma::mat( m, n, arma::fill::zeros );
+    R = arma::mat( n, n, arma::fill::zeros );
+    for( int k = 0; k < n; k++ ) {
+//        Q.col(k) = A.col(k);
+        R(k, k) = ( arma::norm( Q.col(k) ) );
+        Q.col(k) = Q.col(k) / R(k, k);
+        for( int i = ( k + 1 ); i < n; i++ ) {
+            R(k, i) = arma::dot( arma::trans( Q.col(k) ), Q.col(i) );
+            Q.col(i) = Q.col(i) - R(k, i) * Q.col(k);
+        }
+    }
     return 0;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-int SchwarzRutishauser(arma::mat &Q, arma::mat &R, const arma::mat &A, bool econ, double tol )
+int SchwarzRutishauser( arma::mat &Q, arma::mat &R, const arma::mat &A, bool econ, double tol )
 {
     int m = A.n_rows;
     int n = A.n_cols;

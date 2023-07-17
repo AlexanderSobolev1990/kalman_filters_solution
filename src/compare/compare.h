@@ -243,7 +243,7 @@ public:
     std::function<arma::vec( const arma::vec &DeltaX )> checkDeltaState =
         [&]( const arma::vec &DeltaX )->arma::vec {
             arma::vec DeltaX_ = DeltaX;
-            DeltaX_[3] = checkDeltaAngle( DeltaX_[3] );
+            DeltaX_[3] = checkDeltaAngle( DeltaX_[3] ); // Курс
             return DeltaX_;
         };
 

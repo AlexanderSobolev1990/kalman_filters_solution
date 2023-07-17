@@ -405,7 +405,7 @@ public:
 #ifdef DEBUG_KALMAN
         B.print( this->filterName_ + " Correction, B' ( block of R_, dYcal_, dXcal_ ):" );
 #endif
-        // 2. Выполнить JQR разложение блочной матрицы B и считать результат:
+        // 2. Выполнить QR разложение блочной матрицы B и считать результат:
         // [ S     0 ]
         // [ Pxy*  P ]        
         arma::mat Q_qr_corr, R_qr_corr;

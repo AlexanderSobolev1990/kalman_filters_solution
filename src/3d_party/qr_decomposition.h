@@ -72,6 +72,8 @@ int J_orthogonal( arma::mat &Q, arma::mat &R, arma::mat &J1, const arma::mat &A,
 ///
 int ModifiedGramSchmidt( arma::mat &Q, arma::mat &R, const arma::mat &A );
 
+int ModifiedGramSchmidtRowByRow( arma::mat &Q, arma::mat &R, const arma::mat &A );
+
 //----------------------------------------------------------------------------------------------------------------------
 ///
 /// \brief Модифицированное QR-разложение Шварца-Рутисхаузера (Schwarz-Rutishauser)

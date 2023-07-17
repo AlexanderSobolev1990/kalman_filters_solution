@@ -84,6 +84,7 @@ int main( int argc, char *argv[] )
 #ifdef SRUKF_
         ( "srukf", "Квадратно-Корневой Сигма-точечный Фильтр Калмана, КК-СТФК (Square Root Unscented Kalman Filter, SRUKF)" )
         ( "srukf2", "аналогично srukf, но фильтр без пересоздания сигма-точек в прогнозе" )
+        ( "srukf3", "аналогично srukf, но фильтр без пересоздания сигма-точек в прогнозе и сразу учет P+=Q" )
         ( "srukfb", "Квадратно-Корневой Сигма-точечный Фильтр Калмана (блочная реализация), КК-СТФКБ (Square Root Unscented Kalman Filter Block, SRUKFB)" )
 #endif
 #ifdef CKF_
@@ -219,6 +220,9 @@ int main( int argc, char *argv[] )
     }
     if( vm.count( "srukf2" ) ) {
         settings.Filters.push_back("SRUKF2");
+    }
+    if( vm.count( "srukf3" ) ) {
+        settings.Filters.push_back("SRUKF3");
     }
     if( vm.count( "srukfb" ) ) {
         settings.Filters.push_back("SRUKFB");

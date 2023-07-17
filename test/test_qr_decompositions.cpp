@@ -10,6 +10,9 @@
 #define BOOST_TEST_MODULE test_qr_decompositions
 
 #include <iostream>
+#include <iomanip>
+#include <limits>
+//#include <numbers>
 #include <armadillo>
 #include <boost/test/unit_test.hpp>
 
@@ -47,18 +50,54 @@ arma::mat R_right_answer_JQR = {
 
 BOOST_AUTO_TEST_CASE( test_qr_mgs )
 {
+    for( int i = 0; i > 1000000; i++ ) {
+    arma::mat Q_answer,R_answer;    
+    arma::mat QR_input2 = {
+    {   12.0,   89.0 },
+    {   15.0,   91.0 },
+    {   24.0,   36.0 }
+    };
+    int result = SPML::QR::ModifiedGramSchmidt( Q_answer, R_answer, QR_input2 );
+    }
+//    std::setprecision(11);
+//    std::cout.setf( std::ios::fixed );
+//    Q_answer.raw_print( std::cout, "Q:");
+//    R_answer.raw_print( std::cout, "R:");
+//    BOOST_CHECK_EQUAL( result, 0 );
+//    double eps = 1.0e-6;
+//    BOOST_CHECK_EQUAL( arma::approx_equal( Q_answer, Q_right_answer_QR, "absdiff", eps ), true );
+//    BOOST_CHECK_EQUAL( arma::approx_equal( R_answer, R_right_answer_QR, "absdiff", eps ), true );
+}
+
+BOOST_AUTO_TEST_CASE( test_qr_mgs_rbr )
+{
+    for( int i = 0; i > 1000000; i++ ) {
     arma::mat Q_answer,R_answer;
-    int result = SPML::QR::ModifiedGramSchmidt( Q_answer, R_answer, QR_input );
-    BOOST_CHECK_EQUAL( result, 0 );
-    double eps = 1.0e-6;
-    BOOST_CHECK_EQUAL( arma::approx_equal( Q_answer, Q_right_answer_QR, "absdiff", eps ), true );
-    BOOST_CHECK_EQUAL( arma::approx_equal( R_answer, R_right_answer_QR, "absdiff", eps ), true );
+    arma::mat QR_input2 = {
+    {   12.0,   89.0 },
+    {   15.0,   91.0 },
+    {   24.0,   36.0 }
+    };
+    int result = SPML::QR::ModifiedGramSchmidtRowByRow( Q_answer, R_answer, QR_input2 );
+    }
+//    std::setprecision(11);
+//    std::cout.setf( std::ios::fixed );
+//    Q_answer.raw_print( std::cout, "Q:");
+//    R_answer.raw_print( std::cout, "R:");
+//    BOOST_CHECK_EQUAL( result, 0 );
+//    double eps = 1.0e-6;
+//    BOOST_CHECK_EQUAL( arma::approx_equal( Q_answer, Q_right_answer_QR, "absdiff", eps ), true );
+//    BOOST_CHECK_EQUAL( arma::approx_equal( R_answer, R_right_answer_QR, "absdiff", eps ), true );
 }
 
 BOOST_AUTO_TEST_CASE( test_qr_schr )
 {
     arma::mat Q_answer,R_answer;
     int result = SPML::QR::SchwarzRutishauser( Q_answer, R_answer, QR_input, true );
+    std::setprecision(11);
+    std::cout.setf( std::ios::fixed );
+    Q_answer.raw_print( std::cout, "Q:");
+    R_answer.raw_print( std::cout, "R:");
     BOOST_CHECK_EQUAL( result, 0 );
     double eps = 1.0e-6;
     BOOST_CHECK_EQUAL( arma::approx_equal( Q_answer, Q_right_answer_QR, "absdiff", eps ), true );
