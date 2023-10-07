@@ -58,7 +58,7 @@ public:
 #ifdef DEBUG_KALMAN
         this->SetFilterName( "SREUKF" );
 #endif
-        createSignMatrices();
+//        this->createSignMatrices();
     }
     // default copy/move/assignment semantic:
 //    CKalmanSREUKF( const CKalmanSREUKF& ) = default;
@@ -106,31 +106,6 @@ public:
 
         this->CorrectionSRUKF( Y_msd );
     }
-
-protected:
-    //------------------------------------------------------------------------------------------------------------------
-    // Матрицы знаков
-
-    arma::mat::fixed<CKalmanSREUKF::k_sigma_points_, CKalmanSREUKF::k_sigma_points_> J_ =
-        arma::mat::fixed<CKalmanSREUKF::k_sigma_points_, CKalmanSREUKF::k_sigma_points_>( arma::fill::eye ); ///< Матрица знаков при Pxy
-    static const int JQR_correct_size = ( 2 * SizeX + 1 ) + SizeY;
-    arma::mat::fixed<JQR_correct_size, JQR_correct_size> Jcorrect_ =
-        arma::mat::fixed<JQR_correct_size, JQR_correct_size>( arma::fill::eye ); ///< Матрица знаков при коррекции
-
-    //------------------------------------------------------------------------------------------------------------------
-    ///
-    /// \brief Создание матриц знаков
-    ///
-    void createSignMatrices()
-    {
-        if( this->weights_covariance_( this->k_sigma_points_ - 1 ) < 0.0 ) {
-            Jcorrect_( JQR_correct_size - 1, JQR_correct_size - 1 ) = -1.0;
-        }
-
-        if( this->weights_covariance_( this->k_sigma_points_ - 1 ) < 0.0 ) {
-            J_( this->k_sigma_points_ - 1, this->k_sigma_points_ - 1 ) = -1.0;
-        }
-    }
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -156,6 +131,7 @@ template<size_t SizeX, size_t SizeY>
 class CKalmanSREUKFB : public CKalmanSREUKF<SizeX, SizeY>
 {
 public:
+    using CKalmanSREUKF<SizeX, SizeY>::CKalmanSREUKF;
     //------------------------------------------------------------------------------------------------------------------
     // Конструкторы:
 
@@ -166,9 +142,10 @@ public:
     {
 #ifdef DEBUG_KALMAN
         this->SetFilterName( "SREUKFB" );
-#endif
-        this->createSignMatricesBlock();
+#endif        
+//        this->createSignMatricesBlock();
     }
+    // default copy/move/assignment semantic:
 //    CKalmanSREUKFB( const CKalmanSREUKFB& ) = default;
 //    CKalmanSREUKFB& operator=( const CKalmanSREUKFB& ) = default;
 //    CKalmanSREUKFB( CKalmanSREUKFB&& ) = default;
@@ -316,7 +293,7 @@ public:
 
 protected:
     //------------------------------------------------------------------------------------------------------------------
-    // Матрицы знаков:    
+    // Матрицы знаков:            
     static const int QRsizeY = ( SizeY + ( 2 * SizeX + 1 ) );
     arma::mat::fixed<QRsizeY, QRsizeY> JcorrectBlock_ = arma::mat::fixed<QRsizeY, QRsizeY>( arma::fill::eye ); ///< Матрица знаков для фильтра в блочном виде
 
@@ -324,12 +301,13 @@ protected:
     ///
     /// \brief Создание матриц знаков
     ///
-    void createSignMatricesBlock()
+    virtual void createSignMatrices()
     {        
-        if( this->weights_covariance_( this->k_sigma_points_- 1 ) < 0.0 ) {
-            JcorrectBlock_( QRsizeY - 1, QRsizeY - 1 ) = -1.0;
+        if( this->negativeZeroCovWeight_ ) {
+            this->Jpredict_( this->JQR_predict_size - 1, this->JQR_predict_size - 1 ) = -1.0;
+            this->JcorrectBlock_( this->QRsizeY - 1, this->QRsizeY - 1 ) = -1.0;
         }
-    }
+    }    
 };
 
 }

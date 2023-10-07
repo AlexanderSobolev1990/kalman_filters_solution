@@ -111,6 +111,7 @@ template<size_t SizeX, size_t SizeY>
 class CKalmanSRECKFB : public CKalmanSRECKF<SizeX, SizeY>
 {
 public:
+    using CKalmanSRECKF<SizeX, SizeY>::CKalmanSRECKF;
     //------------------------------------------------------------------------------------------------------------------
     // Конструкторы:
 

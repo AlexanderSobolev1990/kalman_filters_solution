@@ -65,8 +65,7 @@ public:
     {
 #ifdef DEBUG_KALMAN
         this->SetFilterName( "SRUKF" );
-#endif
-        createSignMatrices();
+#endif        
     }
     // default copy/move/assignment semantic:
 //    CKalmanSRUKF( const CKalmanSRUKF& ) = default;
@@ -116,6 +115,8 @@ public:
         this->alpha_ = 0.0;
         this->beta_ = 0.0;
         this->lambda_ = 0.0;
+
+        this->createSignMatrices();
 
 #ifdef DEBUG_KALMAN
         std::cout << this->filterName_ + " SetupDesignParametersMeanSet:" << std::endl;
@@ -171,6 +172,8 @@ public:
         // Параметр w0_ при данном способе создания сигма точек не используется:
         this->w0_ = 0.0;
 
+        this->createSignMatrices();
+
 #ifdef DEBUG_KALMAN
         std::cout << this->filterName_ + " SetupDesignParametersScaledSet:" << std::endl;
         std::cout << "weights_mean_:" << std::endl;
@@ -221,6 +224,8 @@ public:
         this->kappa_ = 0.0;
         this->w0_ = 0.0;
         this->lambda_ = 0.0;
+
+        this->createSignMatrices();
 
 #ifdef DEBUG_KALMAN
         std::cout << this->filterName_ + " SetupDesignParametersCDKF:" << std::endl;
@@ -536,14 +541,11 @@ protected:
     ///
     /// \brief Создание матриц знаков
     ///
-    void createSignMatrices()
+    virtual void createSignMatrices()
     {
-        if( this->weights_covariance_( this->k_sigma_points_ - 1 ) < 0.0 ) {
-            this->Jpredict_( JQR_predict_size - 1, JQR_predict_size - 1 ) = -1.0;
-            this->Jcorrect_( JQR_correct_size - 1, JQR_correct_size - 1 ) = -1.0;
-        }
-
-        if( this->weights_covariance_( this->k_sigma_points_ - 1 ) < 0.0 ) {
+        if( this->negativeZeroCovWeight_ ) {
+            this->Jpredict_( this->JQR_predict_size - 1, this->JQR_predict_size - 1 ) = -1.0;
+            this->Jcorrect_( this->JQR_correct_size - 1, this->JQR_correct_size - 1 ) = -1.0;
             this->J_( this->k_sigma_points_ - 1, this->k_sigma_points_ - 1 ) = -1.0;
         }
     }
@@ -909,6 +911,7 @@ template<size_t SizeX, size_t SizeY>
 class CKalmanSRUKFB : public CKalmanSRUKF<SizeX, SizeY>
 {
 public:
+    using CKalmanSRUKF<SizeX, SizeY>::CKalmanSRUKF;
     //------------------------------------------------------------------------------------------------------------------
     // Конструкторы:
 
@@ -919,8 +922,7 @@ public:
     {
 #ifdef DEBUG_KALMAN
         this->SetFilterName( "SRUKFB" );
-#endif
-        createSignMatricesBlock();
+#endif        
     }
     // default copy/move/assignment semantic:
 //    CKalmanSRUKFB( const CKalmanSRUKFB& ) = default;
@@ -1062,10 +1064,11 @@ protected:
     ///
     /// \brief Создание матриц знаков
     ///
-    void createSignMatricesBlock()
-    {        
-        if( this->weights_covariance_( this->k_sigma_points_- 1 ) < 0.0 ) {
-            JcorrectBlock_( QRsizeY - 1, QRsizeY - 1 ) = -1.0;
+    virtual void createSignMatrices()
+    {
+        if( this->negativeZeroCovWeight_ ) {
+            this->Jpredict_( this->JQR_predict_size  - 1, this->JQR_predict_size - 1 ) = -1.0;
+            this->JcorrectBlock_( this->QRsizeY - 1, this->QRsizeY - 1 ) = -1.0;
         }
     }
 };

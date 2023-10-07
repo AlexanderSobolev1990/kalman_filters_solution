@@ -299,7 +299,7 @@ protected:
         ( this->X_pred_ ).print( this->filterName_ + " Prediction, X_pred_:" );
 #endif
         // 4. Вычисление ковариационной матрицы Р
-        this->P_ = ( this->Q_ * std::abs( std::abs( dt ) ) );
+        this->P_ = ( this->Q_ * std::abs( dt ) );
         for( int i = 0; i < this->k_sigma_points_; i++ ) {
             this->dXcal_.col(i) = this->x_pred_sigma_points_.col(i) - this->X_pred_;
             if( this->checkDeltaState_ != nullptr ) {
