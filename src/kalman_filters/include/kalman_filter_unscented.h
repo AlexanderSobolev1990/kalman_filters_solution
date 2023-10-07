@@ -57,10 +57,10 @@ public:
 #endif
     }
     // default copy/move/assignment semantic:
-    CKalmanUKF( const CKalmanUKF& ) = default;
-    CKalmanUKF& operator=( const CKalmanUKF& ) = default;
-    CKalmanUKF( CKalmanUKF&& ) = default;
-    CKalmanUKF& operator=( CKalmanUKF&& ) = default;
+//    CKalmanUKF( const CKalmanUKF& ) = default;
+//    CKalmanUKF& operator=( const CKalmanUKF& ) = default;
+//    CKalmanUKF( CKalmanUKF&& ) = default;
+//    CKalmanUKF& operator=( CKalmanUKF&& ) = default;
     virtual ~CKalmanUKF() = default;
 
     //------------------------------------------------------------------------------------------------------------------

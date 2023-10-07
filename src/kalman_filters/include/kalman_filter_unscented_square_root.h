@@ -69,10 +69,10 @@ public:
         createSignMatrices();
     }
     // default copy/move/assignment semantic:
-    CKalmanSRUKF( const CKalmanSRUKF& ) = default;
-    CKalmanSRUKF& operator=( const CKalmanSRUKF& ) = default;
-    CKalmanSRUKF( CKalmanSRUKF&& ) = default;
-    CKalmanSRUKF& operator=( CKalmanSRUKF&& ) = default;
+//    CKalmanSRUKF( const CKalmanSRUKF& ) = default;
+//    CKalmanSRUKF& operator=( const CKalmanSRUKF& ) = default;
+//    CKalmanSRUKF( CKalmanSRUKF&& ) = default;
+//    CKalmanSRUKF& operator=( CKalmanSRUKF&& ) = default;
     virtual ~CKalmanSRUKF() = default;
 
     //------------------------------------------------------------------------------------------------------------------
@@ -569,10 +569,10 @@ public:
 #endif
     }
     // default copy/move/assignment semantic:
-    CKalmanSRUKF2( const CKalmanSRUKF2& ) = default;
-    CKalmanSRUKF2& operator=( const CKalmanSRUKF2& ) = default;
-    CKalmanSRUKF2( CKalmanSRUKF2&& ) = default;
-    CKalmanSRUKF2& operator=( CKalmanSRUKF2&& ) = default;
+//    CKalmanSRUKF2( const CKalmanSRUKF2& ) = default;
+//    CKalmanSRUKF2& operator=( const CKalmanSRUKF2& ) = default;
+//    CKalmanSRUKF2( CKalmanSRUKF2&& ) = default;
+//    CKalmanSRUKF2& operator=( CKalmanSRUKF2&& ) = default;
     virtual ~CKalmanSRUKF2() = default;
 
     //------------------------------------------------------------------------------------------------------------------
@@ -729,10 +729,10 @@ public:
 //        createSignMatrices2();
     }
     // default copy/move/assignment semantic:
-    CKalmanSRUKF3( const CKalmanSRUKF3& ) = default;
-    CKalmanSRUKF3& operator=( const CKalmanSRUKF3& ) = default;
-    CKalmanSRUKF3( CKalmanSRUKF3&& ) = default;
-    CKalmanSRUKF3& operator=( CKalmanSRUKF3&& ) = default;
+//    CKalmanSRUKF3( const CKalmanSRUKF3& ) = default;
+//    CKalmanSRUKF3& operator=( const CKalmanSRUKF3& ) = default;
+//    CKalmanSRUKF3( CKalmanSRUKF3&& ) = default;
+//    CKalmanSRUKF3& operator=( CKalmanSRUKF3&& ) = default;
     virtual ~CKalmanSRUKF3() = default;
 
     //------------------------------------------------------------------------------------------------------------------
@@ -923,10 +923,10 @@ public:
         createSignMatricesBlock();
     }
     // default copy/move/assignment semantic:
-    CKalmanSRUKFB( const CKalmanSRUKFB& ) = default;
-    CKalmanSRUKFB& operator=( const CKalmanSRUKFB& ) = default;
-    CKalmanSRUKFB( CKalmanSRUKFB&& ) = default;
-    CKalmanSRUKFB& operator=( CKalmanSRUKFB&& ) = default;
+//    CKalmanSRUKFB( const CKalmanSRUKFB& ) = default;
+//    CKalmanSRUKFB& operator=( const CKalmanSRUKFB& ) = default;
+//    CKalmanSRUKFB( CKalmanSRUKFB&& ) = default;
+//    CKalmanSRUKFB& operator=( CKalmanSRUKFB&& ) = default;
     virtual ~CKalmanSRUKFB() = default;
 
     //------------------------------------------------------------------------------------------------------------------
@@ -1054,6 +1054,7 @@ public:
 
 protected:
     //------------------------------------------------------------------------------------------------------------------
+    // Матрицы знаков:
     static const int QRsizeY = ( SizeY + ( 2 * SizeX + 1 ) );
     arma::mat::fixed<QRsizeY, QRsizeY> JcorrectBlock_ = arma::mat::fixed<QRsizeY, QRsizeY>( arma::fill::eye ); ///< Матрица знаков для фильтра в блочном виде
 

@@ -61,10 +61,10 @@ public:
         createSignMatrices();
     }
     // default copy/move/assignment semantic:
-    CKalmanSREUKF( const CKalmanSREUKF& ) = default;
-    CKalmanSREUKF& operator=( const CKalmanSREUKF& ) = default;
-    CKalmanSREUKF( CKalmanSREUKF&& ) = default;
-    CKalmanSREUKF& operator=( CKalmanSREUKF&& ) = default;
+//    CKalmanSREUKF( const CKalmanSREUKF& ) = default;
+//    CKalmanSREUKF& operator=( const CKalmanSREUKF& ) = default;
+//    CKalmanSREUKF( CKalmanSREUKF&& ) = default;
+//    CKalmanSREUKF& operator=( CKalmanSREUKF&& ) = default;
     virtual ~CKalmanSREUKF() = default;
 
     //------------------------------------------------------------------------------------------------------------------
@@ -169,60 +169,12 @@ public:
 #endif
         this->createSignMatricesBlock();
     }
-/*
-    ///
-    /// \brief Конструктор копирования
-    /// \param other - экземпляр, с которого делается копия
-    ///
-    CKalmanSREUKFB( const CKalmanSREUKFB &other ) : CKalmanEKF<SizeX, SizeY>( other ), CKalmanSREUKF<SizeX, SizeY>( other )
-    {}
+    //    CKalmanSREUKFB( const CKalmanSREUKFB& ) = default;
+    //    CKalmanSREUKFB& operator=( const CKalmanSREUKFB& ) = default;
+    //    CKalmanSREUKFB( CKalmanSREUKFB&& ) = default;
+    //    CKalmanSREUKFB& operator=( CKalmanSREUKFB&& ) = default;
+        virtual ~CKalmanSREUKFB() = default;
 
-    ///
-    /// \brief Перегрузка оператора присвоения
-    /// \param other - экземпляр, с которого делается копия
-    /// \return *this
-    ///
-    CKalmanSREUKFB& operator=( const CKalmanSREUKFB &other )
-    {
-        CKalmanSREUKFB copy( other );
-        swap( *this, copy );
-        return *this;
-    }
-
-    ///
-    /// \brief Конструктор перемещения
-    /// \param other - экземпляр, с которого делается копия
-    ///
-    CKalmanSREUKFB( CKalmanSREUKFB &&other ) noexcept
-    {
-        swap( *this, other );
-    }
-
-    ///
-    /// \brief Перегрузка оператора перемещения
-    /// \param other - экземпляр, с которого делается копия
-    /// \return *this
-    ///
-    CKalmanSREUKFB& operator=( CKalmanSREUKFB &&other ) noexcept
-    {
-        swap( *this, other );
-        return *this;
-    }
-
-    virtual ~CKalmanSREUKFB() = default; ///< Дестркутор
-
-    ///
-    /// \brief Метод свапа
-    /// \param lhs - left hand side instance
-    /// \param rhs - right hand side instance
-    ///
-    friend void swap( CKalmanSREUKFB<SizeX, SizeY> &lhs, CKalmanSREUKFB<SizeX, SizeY> &rhs ) noexcept
-    {
-        swap( dynamic_cast< CKalmanSREUKF<SizeX, SizeY> &>( lhs ), dynamic_cast< CKalmanSREUKF<SizeX, SizeY> &>( rhs ) ); // Свап предка 1 порядка
-
-        std::swap( lhs.JcorrectBlock_, rhs.JcorrectBlock_ );
-    }
-*/
     //------------------------------------------------------------------------------------------------------------------
     // Методы прогноза и коррекции:
 
@@ -364,17 +316,16 @@ public:
 
 protected:
     //------------------------------------------------------------------------------------------------------------------
-    // Матрицы знаков:
-    arma::mat JcorrectBlock_; ///< Матрица знаков для фильтра в блочном виде
+    // Матрицы знаков:    
+    static const int QRsizeY = ( SizeY + ( 2 * SizeX + 1 ) );
+    arma::mat::fixed<QRsizeY, QRsizeY> JcorrectBlock_ = arma::mat::fixed<QRsizeY, QRsizeY>( arma::fill::eye ); ///< Матрица знаков для фильтра в блочном виде
 
     //------------------------------------------------------------------------------------------------------------------
     ///
     /// \brief Создание матриц знаков
     ///
     void createSignMatricesBlock()
-    {
-        int QRsizeY = ( SizeY + ( 2 * SizeX + 1 ) );
-        JcorrectBlock_ = arma::mat( QRsizeY, QRsizeY, arma::fill::eye );
+    {        
         if( this->weights_covariance_( this->k_sigma_points_- 1 ) < 0.0 ) {
             JcorrectBlock_( QRsizeY - 1, QRsizeY - 1 ) = -1.0;
         }

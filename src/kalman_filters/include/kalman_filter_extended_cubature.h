@@ -44,10 +44,10 @@ public:
 #endif
     }
     // default copy/move/assignment semantic:
-    CKalmanECKF( const CKalmanECKF& ) = default;
-    CKalmanECKF& operator=( const CKalmanECKF& ) = default;
-    CKalmanECKF( CKalmanECKF&& ) = default;
-    CKalmanECKF& operator=( CKalmanECKF&& ) = default;
+//    CKalmanECKF( const CKalmanECKF& ) = default;
+//    CKalmanECKF& operator=( const CKalmanECKF& ) = default;
+//    CKalmanECKF( CKalmanECKF&& ) = default;
+//    CKalmanECKF& operator=( CKalmanECKF&& ) = default;
     virtual ~CKalmanECKF() = default;
 
     //------------------------------------------------------------------------------------------------------------------

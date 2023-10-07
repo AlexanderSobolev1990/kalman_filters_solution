@@ -49,10 +49,10 @@ public:
         this->SetupDesignParametersCubatureBaseSet();
     }    
     // default copy/move/assignment semantic:
-    CKalmanCKF( const CKalmanCKF& ) = default;
-    CKalmanCKF& operator=( const CKalmanCKF& ) = default;
-    CKalmanCKF( CKalmanCKF&& ) = default;
-    CKalmanCKF& operator=( CKalmanCKF&& ) = default;
+//    CKalmanCKF( const CKalmanCKF& ) = default;
+//    CKalmanCKF& operator=( const CKalmanCKF& ) = default;
+//    CKalmanCKF( CKalmanCKF&& ) = default;
+//    CKalmanCKF& operator=( CKalmanCKF&& ) = default;
     virtual ~CKalmanCKF() = default;
 
     //------------------------------------------------------------------------------------------------------------------

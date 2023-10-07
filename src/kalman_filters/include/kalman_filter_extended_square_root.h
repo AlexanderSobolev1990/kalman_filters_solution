@@ -47,10 +47,10 @@ public:
 #endif
     }
     // default copy/move/assignment semantic:
-    CKalmanSREKF( const CKalmanSREKF& ) = default;
-    CKalmanSREKF& operator=( const CKalmanSREKF& ) = default;
-    CKalmanSREKF( CKalmanSREKF&& ) = default;
-    CKalmanSREKF& operator=( CKalmanSREKF&& ) = default;
+//    CKalmanSREKF( const CKalmanSREKF& ) = default;
+//    CKalmanSREKF& operator=( const CKalmanSREKF& ) = default;
+//    CKalmanSREKF( CKalmanSREKF&& ) = default;
+//    CKalmanSREKF& operator=( CKalmanSREKF&& ) = default;
     virtual ~CKalmanSREKF() = default;
 
     //------------------------------------------------------------------------------------------------------------------
@@ -82,8 +82,8 @@ public:
         this->prediction_isDone = false; // Сразу же снять признак
 
         // 1. Вычисление ковариационной матрицы S        
-        this->S_ = this->H_ * this->P_;
-        arma::mat QR_input_S_corr = arma::trans( arma::join_horiz( this->S_, this->R_ ) ); // QR_input = [ S_, R ], Транспонировать, т.к. в QR разложение так надо
+        arma::mat S_tmp = this->H_ * this->P_;
+        arma::mat QR_input_S_corr = arma::trans( arma::join_horiz( S_tmp, this->R_ ) ); // QR_input = [ S_, R ], Транспонировать, т.к. в QR разложение так надо
         arma::mat Q_qr_S_corr, R_qr_S_corr;
         int res_QR_S_corr = SPML::QR::ModifiedGramSchmidt( Q_qr_S_corr, R_qr_S_corr, QR_input_S_corr ); // Вызов QR разложения
         assert( res_QR_S_corr == 0 );

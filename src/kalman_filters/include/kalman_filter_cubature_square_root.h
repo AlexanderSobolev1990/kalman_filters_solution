@@ -47,10 +47,10 @@ public:
 #endif
     }
     // default copy/move/assignment semantic:
-    CKalmanSRCKF( const CKalmanSRCKF& ) = default;
-    CKalmanSRCKF& operator=( const CKalmanSRCKF& ) = default;
-    CKalmanSRCKF( CKalmanSRCKF&& ) = default;
-    CKalmanSRCKF& operator=( CKalmanSRCKF&& ) = default;
+//    CKalmanSRCKF( const CKalmanSRCKF& ) = default;
+//    CKalmanSRCKF& operator=( const CKalmanSRCKF& ) = default;
+//    CKalmanSRCKF( CKalmanSRCKF&& ) = default;
+//    CKalmanSRCKF& operator=( CKalmanSRCKF&& ) = default;
     virtual ~CKalmanSRCKF() = default;
 
     //------------------------------------------------------------------------------------------------------------------
@@ -349,10 +349,10 @@ public:
 #endif
     }
     // default copy/move/assignment semantic:
-    CKalmanSRCKFB( const CKalmanSRCKFB& ) = default;
-    CKalmanSRCKFB& operator=( const CKalmanSRCKFB& ) = default;
-    CKalmanSRCKFB( CKalmanSRCKFB&& ) = default;
-    CKalmanSRCKFB& operator=( CKalmanSRCKFB&& ) = default;
+//    CKalmanSRCKFB( const CKalmanSRCKFB& ) = default;
+//    CKalmanSRCKFB& operator=( const CKalmanSRCKFB& ) = default;
+//    CKalmanSRCKFB( CKalmanSRCKFB&& ) = default;
+//    CKalmanSRCKFB& operator=( CKalmanSRCKFB&& ) = default;
     virtual ~CKalmanSRCKFB() = default;
 
     //------------------------------------------------------------------------------------------------------------------
