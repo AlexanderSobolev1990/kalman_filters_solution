@@ -53,7 +53,7 @@ public:
 //    CKalmanCKF& operator=( const CKalmanCKF& ) = default;
 //    CKalmanCKF( CKalmanCKF&& ) = default;
 //    CKalmanCKF& operator=( CKalmanCKF&& ) = default;
-    virtual ~CKalmanCKF() = default;
+//    virtual ~CKalmanCKF() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы-сеттеры:

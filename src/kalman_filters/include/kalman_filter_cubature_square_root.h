@@ -51,7 +51,7 @@ public:
 //    CKalmanSRCKF& operator=( const CKalmanSRCKF& ) = default;
 //    CKalmanSRCKF( CKalmanSRCKF&& ) = default;
 //    CKalmanSRCKF& operator=( CKalmanSRCKF&& ) = default;
-    virtual ~CKalmanSRCKF() = default;
+//    virtual ~CKalmanSRCKF() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы-сеттеры:
@@ -353,7 +353,7 @@ public:
 //    CKalmanSRCKFB& operator=( const CKalmanSRCKFB& ) = default;
 //    CKalmanSRCKFB( CKalmanSRCKFB&& ) = default;
 //    CKalmanSRCKFB& operator=( CKalmanSRCKFB&& ) = default;
-    virtual ~CKalmanSRCKFB() = default;
+//    virtual ~CKalmanSRCKFB() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы прогноза и коррекции:

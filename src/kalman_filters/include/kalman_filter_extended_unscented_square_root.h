@@ -65,7 +65,7 @@ public:
 //    CKalmanSREUKF& operator=( const CKalmanSREUKF& ) = default;
 //    CKalmanSREUKF( CKalmanSREUKF&& ) = default;
 //    CKalmanSREUKF& operator=( CKalmanSREUKF&& ) = default;
-    virtual ~CKalmanSREUKF() = default;
+//    virtual ~CKalmanSREUKF() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы прогноза и коррекции:
@@ -169,11 +169,11 @@ public:
 #endif
         this->createSignMatricesBlock();
     }
-    //    CKalmanSREUKFB( const CKalmanSREUKFB& ) = default;
-    //    CKalmanSREUKFB& operator=( const CKalmanSREUKFB& ) = default;
-    //    CKalmanSREUKFB( CKalmanSREUKFB&& ) = default;
-    //    CKalmanSREUKFB& operator=( CKalmanSREUKFB&& ) = default;
-        virtual ~CKalmanSREUKFB() = default;
+//    CKalmanSREUKFB( const CKalmanSREUKFB& ) = default;
+//    CKalmanSREUKFB& operator=( const CKalmanSREUKFB& ) = default;
+//    CKalmanSREUKFB( CKalmanSREUKFB&& ) = default;
+//    CKalmanSREUKFB& operator=( CKalmanSREUKFB&& ) = default;
+//    virtual ~CKalmanSREUKFB() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы прогноза и коррекции:

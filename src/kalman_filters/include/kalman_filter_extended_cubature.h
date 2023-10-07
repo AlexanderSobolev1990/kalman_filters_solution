@@ -48,7 +48,7 @@ public:
 //    CKalmanECKF& operator=( const CKalmanECKF& ) = default;
 //    CKalmanECKF( CKalmanECKF&& ) = default;
 //    CKalmanECKF& operator=( CKalmanECKF&& ) = default;
-    virtual ~CKalmanECKF() = default;
+//    virtual ~CKalmanECKF() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы-сеттеры:

@@ -45,11 +45,11 @@ public:
     }
 
     // default copy/move/assignment semantic:
-    CKalmanEKF( const CKalmanEKF& ) = default;
-    CKalmanEKF& operator=( const CKalmanEKF& ) = default;
-    CKalmanEKF( CKalmanEKF&& ) = default;
-    CKalmanEKF& operator=( CKalmanEKF&& ) = default;
-    virtual ~CKalmanEKF() = default;
+//    CKalmanEKF( const CKalmanEKF& ) = default;
+//    CKalmanEKF& operator=( const CKalmanEKF& ) = default;
+//    CKalmanEKF( CKalmanEKF&& ) = default;
+//    CKalmanEKF& operator=( CKalmanEKF&& ) = default;
+//    virtual ~CKalmanEKF() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы-сеттеры:

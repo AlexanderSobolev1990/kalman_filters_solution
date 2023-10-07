@@ -61,7 +61,7 @@ public:
 //    CKalmanEUKF& operator=( const CKalmanEUKF& ) = default;
 //    CKalmanEUKF( CKalmanEUKF&& ) = default;
 //    CKalmanEUKF& operator=( CKalmanEUKF&& ) = default;
-    virtual ~CKalmanEUKF() = default;
+//    virtual ~CKalmanEUKF() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы-сеттеры:

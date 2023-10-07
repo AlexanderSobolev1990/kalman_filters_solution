@@ -51,7 +51,7 @@ public:
 //    CKalmanSREKF& operator=( const CKalmanSREKF& ) = default;
 //    CKalmanSREKF( CKalmanSREKF&& ) = default;
 //    CKalmanSREKF& operator=( CKalmanSREKF&& ) = default;
-    virtual ~CKalmanSREKF() = default;
+//    virtual ~CKalmanSREKF() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы прогноза и коррекции:

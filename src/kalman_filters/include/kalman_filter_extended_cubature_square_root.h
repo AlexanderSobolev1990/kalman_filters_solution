@@ -53,7 +53,7 @@ public:
 //    CKalmanSRECKF& operator=( const CKalmanSRECKF& ) = default;
 //    CKalmanSRECKF( CKalmanSRECKF&& ) = default;
 //    CKalmanSRECKF& operator=( CKalmanSRECKF&& ) = default;
-    virtual ~CKalmanSRECKF() = default;
+//    virtual ~CKalmanSRECKF() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы прогноза и коррекции:
@@ -128,7 +128,7 @@ public:
 //    CKalmanSRECKFB& operator=( const CKalmanSRECKFB& ) = default;
 //    CKalmanSRECKFB( CKalmanSRECKFB&& ) = default;
 //    CKalmanSRECKFB& operator=( CKalmanSRECKFB&& ) = default;
-    virtual ~CKalmanSRECKFB() = default;
+//    virtual ~CKalmanSRECKFB() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы прогноза и коррекции:

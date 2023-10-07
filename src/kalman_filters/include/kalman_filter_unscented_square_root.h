@@ -73,7 +73,7 @@ public:
 //    CKalmanSRUKF& operator=( const CKalmanSRUKF& ) = default;
 //    CKalmanSRUKF( CKalmanSRUKF&& ) = default;
 //    CKalmanSRUKF& operator=( CKalmanSRUKF&& ) = default;
-    virtual ~CKalmanSRUKF() = default;
+//    virtual ~CKalmanSRUKF() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы-сеттеры:
@@ -573,7 +573,7 @@ public:
 //    CKalmanSRUKF2& operator=( const CKalmanSRUKF2& ) = default;
 //    CKalmanSRUKF2( CKalmanSRUKF2&& ) = default;
 //    CKalmanSRUKF2& operator=( CKalmanSRUKF2&& ) = default;
-    virtual ~CKalmanSRUKF2() = default;
+//    virtual ~CKalmanSRUKF2() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы прогноза и коррекции:
@@ -733,7 +733,7 @@ public:
 //    CKalmanSRUKF3& operator=( const CKalmanSRUKF3& ) = default;
 //    CKalmanSRUKF3( CKalmanSRUKF3&& ) = default;
 //    CKalmanSRUKF3& operator=( CKalmanSRUKF3&& ) = default;
-    virtual ~CKalmanSRUKF3() = default;
+//    virtual ~CKalmanSRUKF3() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы прогноза и коррекции:
@@ -927,7 +927,7 @@ public:
 //    CKalmanSRUKFB& operator=( const CKalmanSRUKFB& ) = default;
 //    CKalmanSRUKFB( CKalmanSRUKFB&& ) = default;
 //    CKalmanSRUKFB& operator=( CKalmanSRUKFB&& ) = default;
-    virtual ~CKalmanSRUKFB() = default;
+//    virtual ~CKalmanSRUKFB() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы прогноза и коррекции:
