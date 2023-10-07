@@ -60,6 +60,12 @@ public:
 #endif
         createSignMatrices();
     }
+    // default copy/move/assignment semantic:
+    CKalmanSREUKF( const CKalmanSREUKF& ) = default;
+    CKalmanSREUKF& operator=( const CKalmanSREUKF& ) = default;
+    CKalmanSREUKF( CKalmanSREUKF&& ) = default;
+    CKalmanSREUKF& operator=( CKalmanSREUKF&& ) = default;
+    virtual ~CKalmanSREUKF() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы прогноза и коррекции:
@@ -104,8 +110,12 @@ public:
 protected:
     //------------------------------------------------------------------------------------------------------------------
     // Матрицы знаков
-    arma::mat J_; ///< Матрица знаков при Pxy
-    arma::mat Jcorrect_; ///< Матрица знаков при коррекции
+
+    arma::mat::fixed<CKalmanSREUKF::k_sigma_points_, CKalmanSREUKF::k_sigma_points_> J_ =
+        arma::mat::fixed<CKalmanSREUKF::k_sigma_points_, CKalmanSREUKF::k_sigma_points_>( arma::fill::eye ); ///< Матрица знаков при Pxy
+    static const int JQR_correct_size = ( 2 * SizeX + 1 ) + SizeY;
+    arma::mat::fixed<JQR_correct_size, JQR_correct_size> Jcorrect_ =
+        arma::mat::fixed<JQR_correct_size, JQR_correct_size>( arma::fill::eye ); ///< Матрица знаков при коррекции
 
     //------------------------------------------------------------------------------------------------------------------
     ///
@@ -113,15 +123,12 @@ protected:
     ///
     void createSignMatrices()
     {
-        int JQR_correct_size = ( 2 * SizeX + 1 ) + SizeY;
-        Jcorrect_ = arma::mat( JQR_correct_size, JQR_correct_size, arma::fill::eye );
-        if( this->weights_covariance_( this->k_sigma_points_- 1 ) < 0.0 ) {
-            Jcorrect_( JQR_correct_size-1, JQR_correct_size-1 ) = -1.0;
+        if( this->weights_covariance_( this->k_sigma_points_ - 1 ) < 0.0 ) {
+            Jcorrect_( JQR_correct_size - 1, JQR_correct_size - 1 ) = -1.0;
         }
 
-        J_ = arma::mat( this->k_sigma_points_, this->k_sigma_points_, arma::fill::eye );
-        if( this->weights_covariance_( this->k_sigma_points_- 1 ) < 0.0 ) {
-            J_( this->k_sigma_points_- 1, this->k_sigma_points_- 1 ) = -1.0;
+        if( this->weights_covariance_( this->k_sigma_points_ - 1 ) < 0.0 ) {
+            J_( this->k_sigma_points_ - 1, this->k_sigma_points_ - 1 ) = -1.0;
         }
     }
 };

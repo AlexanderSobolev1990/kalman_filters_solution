@@ -42,35 +42,13 @@ public:
     CKalmanLKF() :
 #ifdef DEBUG_KALMAN
         filterName_( "LKF" ),
-#endif
-        SizeX_( SizeX ),
-        SizeY_( SizeY ),
-
-        F_( arma::eye( SizeX_, SizeX_ ) ),
-        H_( arma::zeros( SizeY_, SizeX_ ) ),
-
-        K_( arma::zeros( SizeX_, SizeY_ ) ),
-        I_( arma::eye( SizeX_, SizeX_ ) ),
-        DeltaY_( arma::zeros( SizeY_ ) ),
-
-        P_( arma::zeros( SizeX_, SizeX_ ) ),
-        S_( arma::zeros( SizeY_, SizeY_ ) ),
-        Q_( arma::zeros( SizeX_, SizeX_ ) ),
-        R_( arma::zeros( SizeY_, SizeY_ ) ),
-
-        X_pred_( arma::zeros( SizeX_ ) ),
-        Y_pred_( arma::zeros( SizeY_ ) ),
-        X_est_( arma::zeros( SizeX_ ) ),
-        Y_est_( arma::zeros( SizeY_ ) ),
-        Y_msd_( arma::zeros( SizeY_ ) ),
-
+#endif        
         deltaY_isSet( false ),
         Y_msd_isSet( false ),
         prediction_isDone( false )
     {}
 
     // default copy/move/assignment semantic:
-
     CKalmanLKF( const CKalmanLKF& ) = default;
     CKalmanLKF& operator=( const CKalmanLKF& ) = default;
     CKalmanLKF( CKalmanLKF&& ) = default;
@@ -361,6 +339,28 @@ public:
     const arma::mat &GetEstimatedVectorY() const { return Y_est_; }
 
     //------------------------------------------------------------------------------------------------------------------
+    // Отдельно геттеры/сеттеры для X и Y
+    arma::vec &X() { return X_est_; }
+    const arma::vec &X() const { return X_est_; }    
+    double &X( int index ) { return X_est_( index ); }
+    const double &X( int index ) const { return X_est_( index ); }
+    //---
+    arma::vec &Y() { return Y_est_; }
+    const arma::vec &Y() const { return Y_est_; }
+    double &Y( int index ) { return Y_est_( index ); }
+    const double &Y( int index ) const { return Y_est_( index ); }
+    //---
+//    arma::vec &P() { return P_; }
+    const arma::mat &P() const { return P_; }
+    double &P( int i, int j ) { return P_( i, j ); }
+    const double &P( int i, int j ) const { return P_( i, j ); }
+    //---
+//    arma::vec &H() { return H_; }
+    const arma::mat &H() const { return H_; }
+    double &H( int i, int j ) { return H_( i, j ); }
+    const double &H( int i, int j ) const { return H_( i, j ); }
+
+    //------------------------------------------------------------------------------------------------------------------
     // Виртуальные методы прогноза и коррекции:
 
     ///
@@ -386,7 +386,7 @@ public:
         P_.print( this->filterName_ + " Prediction, P before:" );
 #endif
         // 2. Вычисление ковариационной матрицы Р
-        P_ = ( F_ * P_ * arma::trans( F_ ) ) + ( Q_ * dt ); // Сразу прибавить Q (в случае, если матрица Q - плотная)
+        P_ = ( F_ * P_ * arma::trans( F_ ) ) + ( Q_ * std::abs( dt ) ); // Сразу прибавить Q (в случае, если матрица Q - плотная)
         fixMatrixMainDiagonalSymmetry( P_ );        
 #ifdef DEBUG_KALMAN
         P_.print( this->filterName_ + " Prediction, P after:" );
@@ -505,30 +505,30 @@ protected:
 #endif
 
     // Размерности:
-    size_t SizeX_;      ///< Размерность вектора состояния Х (state)
-    size_t SizeY_;      ///< Размернсоть вектора измУстановка матрицы SetEstimateCovarianceMatrixPерений Y (measurement)
+    static const size_t SizeX_ = SizeX; ///< Размерность вектора состояния Х (state)
+    static const size_t SizeY_ = SizeY; ///< Размернсоть вектора измУстановка матрицы SetEstimateCovarianceMatrixPерений Y (measurement)
 
     // Матрицы системы:
-    arma::mat F_;       ///< Матрица эволюции системы (перехода состояния) (state-transition model), размерность [SizeX * SizeX]
-    arma::mat H_;       ///< Матрица измерений (перехода измерений) (observation model), размерность [SizeY * SizeX]
+    arma::mat::fixed<SizeX, SizeX> F_ = arma::mat::fixed<SizeX, SizeX>( arma::fill::eye ); ///< Матрица эволюции системы (перехода состояния) (state-transition model), размерность [SizeX * SizeX]
+    arma::mat::fixed<SizeY, SizeX> H_; ///< Матрица измерений (перехода измерений) (observation model), размерность [SizeY * SizeX]
 
     // Дополнительные матрицы:
-    arma::mat K_;       ///< Коэффициент усиления фильтра Калмана (Kalman gain), размерность [SizeX * SizeY]
-    arma::mat I_;       ///< Единичная матрица, размерность [SizeX * SizeX]
-    arma::vec DeltaY_;  ///< Вектор невязки измерений, размерность [SizeY]
+    arma::mat::fixed<SizeX, SizeY> K_; ///< Коэффициент усиления фильтра Калмана (Kalman gain), размерность [SizeX * SizeY]
+    arma::mat::fixed<SizeX, SizeX> I_ = arma::mat::fixed<SizeX, SizeX>( arma::fill::eye ); ///< Единичная матрица, размерность [SizeX * SizeX]
+    arma::vec::fixed<SizeY> DeltaY_; ///< Вектор невязки измерений, размерность [SizeY]
 
     // Ковариационные матрицы:
-    arma::mat P_;       ///< Ковариационная матрица вектора состояния X (estimate covariance matrix), размерность [SizeX * SizeX]
-    arma::mat S_;       ///< Ковариационая матрица вектора невязки (innovation covariance), размерность [SizeY * SizeY]
-    arma::mat Q_;       ///< Ковариационая матрица (обычно диагональная) шумов вектора состояния Х НА 1 СЕКУНДЕ (covariance of the process noise), размерность [SizeX * SizeX]
-    arma::mat R_;       ///< Ковариационая матрица (обычно диагональная) шумов вектора измерений Y (covariance of the observation noise), размерность [SizeY * SizeY]
+    arma::mat::fixed<SizeX, SizeX> P_; ///< Ковариационная матрица вектора состояния X (estimate covariance matrix), размерность [SizeX * SizeX]
+    arma::mat::fixed<SizeY, SizeY> S_; ///< Ковариационая матрица вектора невязки (innovation covariance), размерность [SizeY * SizeY]
+    arma::mat::fixed<SizeX, SizeX> Q_; ///< Ковариационая матрица (обычно диагональная) шумов вектора состояния Х НА 1 СЕКУНДЕ (covariance of the process noise), размерность [SizeX * SizeX]
+    arma::mat::fixed<SizeY, SizeY> R_; ///< Ковариационая матрица (обычно диагональная) шумов вектора измерений Y (covariance of the observation noise), размерность [SizeY * SizeY]
 
     // Вектора состояния и измерения:
-    arma::vec X_pred_;  ///< Экстраполированный (predicted) вектор состояния X, размерность [SizeX]
-    arma::vec Y_pred_;  ///< Экстраполированный (predicted) вектор измерений Y, размерность [SizeY]
-    arma::vec X_est_;   ///< Скорректированный (estimated) вектор состояния X, размерность [SizeX]
-    arma::vec Y_est_;   ///< Скорректированный (estimated) вектор измерений Y, размерность [SizeY]
-    arma::vec Y_msd_;   ///< Измеренный (measured) вектор Y (отметка), размерность [SizeY]
+    arma::vec::fixed<SizeX> X_pred_; ///< Экстраполированный (predicted) вектор состояния X, размерность [SizeX]
+    arma::vec::fixed<SizeY> Y_pred_; ///< Экстраполированный (predicted) вектор измерений Y, размерность [SizeY]
+    arma::vec::fixed<SizeX> X_est_; ///< Скорректированный (estimated) вектор состояния X, размерность [SizeX]
+    arma::vec::fixed<SizeY> Y_est_; ///< Скорректированный (estimated) вектор измерений Y, размерность [SizeY]
+    arma::vec::fixed<SizeY> Y_msd_; ///< Измеренный (measured) вектор Y (отметка), размерность [SizeY]
 
     // Защитные признаки:
     bool deltaY_isSet;  ///< Признак установки вектора невязки DeltaY (нужно в методе Correction)

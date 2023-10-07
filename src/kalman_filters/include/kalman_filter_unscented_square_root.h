@@ -68,6 +68,12 @@ public:
 #endif
         createSignMatrices();
     }
+    // default copy/move/assignment semantic:
+    CKalmanSRUKF( const CKalmanSRUKF& ) = default;
+    CKalmanSRUKF& operator=( const CKalmanSRUKF& ) = default;
+    CKalmanSRUKF( CKalmanSRUKF&& ) = default;
+    CKalmanSRUKF& operator=( CKalmanSRUKF&& ) = default;
+    virtual ~CKalmanSRUKF() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы-сеттеры:
@@ -306,7 +312,7 @@ public:
             }
             this->dXcal_.col(i) *= std::sqrt( std::abs( this->weights_covariance_(i) ) );
         }
-        arma::mat Qdt = this->Q_ * std::sqrt( dt );
+        arma::mat Qdt = this->Q_ * std::sqrt( std::abs( dt ) );
         arma::mat JQR_input_P_pred = arma::trans( arma::join_horiz( Qdt, this->dXcal_ ) ); // JQR_input = [ Qdt, dXcal ], Транспонировать, т.к. в JQR разложение так надо
 #ifdef DEBUG_KALMAN
         JQR_input_P_pred.print( this->filterName_ + " Prediction, JQR_input_P_pred:" );
@@ -514,9 +520,16 @@ protected:
 
     //------------------------------------------------------------------------------------------------------------------
     // Матрицы знаков
-    arma::mat J_; ///< Матрица знаков при Pxy
-    arma::mat Jpredict_; ///< Матрица знаков при прогнозе
-    arma::mat Jcorrect_; ///< Матрица знаков при коррекции
+
+    static const int JQR_predict_size = ( 2 * SizeX + 1 ) + SizeX;
+    static const int JQR_correct_size = ( 2 * SizeX + 1 ) + SizeY;
+
+    arma::mat::fixed<CKalmanSRUKF::k_sigma_points_, CKalmanSRUKF::k_sigma_points_> J_ =
+        arma::mat::fixed<CKalmanSRUKF::k_sigma_points_, CKalmanSRUKF::k_sigma_points_>( arma::fill::eye ); ///< Матрица знаков при Pxy
+    arma::mat::fixed<JQR_predict_size, JQR_predict_size> Jpredict_ =
+        arma::mat::fixed<JQR_predict_size, JQR_predict_size>( arma::fill::eye ); ///< Матрица знаков при прогнозе
+    arma::mat::fixed<JQR_correct_size, JQR_correct_size> Jcorrect_ =
+        arma::mat::fixed<JQR_correct_size, JQR_correct_size>( arma::fill::eye ); ///< Матрица знаков при коррекции
 
     bool negativeZeroCovWeight_; ///< Признак отрицательного веса "нулевой" сигма-точки Wcov
     //------------------------------------------------------------------------------------------------------------------
@@ -525,18 +538,13 @@ protected:
     ///
     void createSignMatrices()
     {
-        int JQR_predict_size = ( 2 * SizeX + 1 ) + SizeX;
-        int JQR_correct_size = ( 2 * SizeX + 1 ) + SizeY;
-        this->Jpredict_ = arma::mat( JQR_predict_size, JQR_predict_size, arma::fill::eye );
-        this->Jcorrect_ = arma::mat( JQR_correct_size, JQR_correct_size, arma::fill::eye );
-        if( this->weights_covariance_( this->k_sigma_points_- 1 ) < 0.0 ) {
-            this->Jpredict_( JQR_predict_size-1, JQR_predict_size-1 ) = -1.0;
-            this->Jcorrect_( JQR_correct_size-1, JQR_correct_size-1 ) = -1.0;
+        if( this->weights_covariance_( this->k_sigma_points_ - 1 ) < 0.0 ) {
+            this->Jpredict_( JQR_predict_size - 1, JQR_predict_size - 1 ) = -1.0;
+            this->Jcorrect_( JQR_correct_size - 1, JQR_correct_size - 1 ) = -1.0;
         }
 
-        this->J_ = arma::mat( this->k_sigma_points_, this->k_sigma_points_, arma::fill::eye );
-        if( this->weights_covariance_( this->k_sigma_points_- 1 ) < 0.0 ) {
-            this->J_( this->k_sigma_points_- 1, this->k_sigma_points_- 1 ) = -1.0;
+        if( this->weights_covariance_( this->k_sigma_points_ - 1 ) < 0.0 ) {
+            this->J_( this->k_sigma_points_ - 1, this->k_sigma_points_ - 1 ) = -1.0;
         }
     }
 };
@@ -560,6 +568,12 @@ public:
         this->SetFilterName( "SRUKF2" );
 #endif
     }
+    // default copy/move/assignment semantic:
+    CKalmanSRUKF2( const CKalmanSRUKF2& ) = default;
+    CKalmanSRUKF2& operator=( const CKalmanSRUKF2& ) = default;
+    CKalmanSRUKF2( CKalmanSRUKF2&& ) = default;
+    CKalmanSRUKF2& operator=( CKalmanSRUKF2&& ) = default;
+    virtual ~CKalmanSRUKF2() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы прогноза и коррекции:
@@ -620,7 +634,7 @@ public:
             }
             this->dXcal_.col(i) *= std::sqrt( std::abs( this->weights_covariance_(i) ) );
         }
-        arma::mat Qdt = this->Q_ * std::sqrt( dt );
+        arma::mat Qdt = this->Q_ * std::sqrt( std::abs( dt ) );
         arma::mat JQR_input_P_pred = arma::trans( arma::join_horiz( Qdt, this->dXcal_ ) ); // JQR_input = [ Qdt, dXcal ], Транспонировать, т.к. в JQR разложение так надо
 #ifdef DEBUG_KALMAN
         JQR_input_P_pred.print( this->filterName_ + " Prediction, JQR_input_P_pred:" );
@@ -714,6 +728,12 @@ public:
 #endif
 //        createSignMatrices2();
     }
+    // default copy/move/assignment semantic:
+    CKalmanSRUKF3( const CKalmanSRUKF3& ) = default;
+    CKalmanSRUKF3& operator=( const CKalmanSRUKF3& ) = default;
+    CKalmanSRUKF3( CKalmanSRUKF3&& ) = default;
+    CKalmanSRUKF3& operator=( CKalmanSRUKF3&& ) = default;
+    virtual ~CKalmanSRUKF3() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы прогноза и коррекции:
@@ -735,7 +755,7 @@ public:
         ( this->P_ ).print( this->filterName_ + " Prediction, P before:" );
 #endif
         // Сразу увеличим шумы
-        arma::mat Qdt = this->Q_ * std::sqrt( dt );
+        arma::mat Qdt = this->Q_ * std::sqrt( std::abs( dt ) );
         this->P_ = this->P_ + Qdt;
 
         this->x_est_sigma_points_.col( this->k_sigma_points_ - 1 ) = this->X_est_; // Нулевая точка - сзади!
@@ -902,6 +922,12 @@ public:
 #endif
         createSignMatricesBlock();
     }
+    // default copy/move/assignment semantic:
+    CKalmanSRUKFB( const CKalmanSRUKFB& ) = default;
+    CKalmanSRUKFB& operator=( const CKalmanSRUKFB& ) = default;
+    CKalmanSRUKFB( CKalmanSRUKFB&& ) = default;
+    CKalmanSRUKFB& operator=( CKalmanSRUKFB&& ) = default;
+    virtual ~CKalmanSRUKFB() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы прогноза и коррекции:
@@ -1028,16 +1054,15 @@ public:
 
 protected:
     //------------------------------------------------------------------------------------------------------------------
-    arma::mat JcorrectBlock_; ///< Матрица знаков для фильтра в блочном виде
+    static const int QRsizeY = ( SizeY + ( 2 * SizeX + 1 ) );
+    arma::mat::fixed<QRsizeY, QRsizeY> JcorrectBlock_ = arma::mat::fixed<QRsizeY, QRsizeY>( arma::fill::eye ); ///< Матрица знаков для фильтра в блочном виде
 
     //------------------------------------------------------------------------------------------------------------------
     ///
     /// \brief Создание матриц знаков
     ///
     void createSignMatricesBlock()
-    {
-        int QRsizeY = ( SizeY + ( 2 * SizeX + 1 ) );
-        JcorrectBlock_ = arma::mat( QRsizeY, QRsizeY, arma::fill::eye );
+    {        
         if( this->weights_covariance_( this->k_sigma_points_- 1 ) < 0.0 ) {
             JcorrectBlock_( QRsizeY - 1, QRsizeY - 1 ) = -1.0;
         }

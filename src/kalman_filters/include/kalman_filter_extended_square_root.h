@@ -46,6 +46,12 @@ public:
         this->SetFilterName( "SREKF" );
 #endif
     }
+    // default copy/move/assignment semantic:
+    CKalmanSREKF( const CKalmanSREKF& ) = default;
+    CKalmanSREKF& operator=( const CKalmanSREKF& ) = default;
+    CKalmanSREKF( CKalmanSREKF&& ) = default;
+    CKalmanSREKF& operator=( CKalmanSREKF&& ) = default;
+    virtual ~CKalmanSREKF() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы прогноза и коррекции:
@@ -154,7 +160,7 @@ protected:
         ( this->P_ ).print( this->filterName_ + " Prediction, P before:" );
 #endif
         // 2. Вычисление ковариационной матрицы P
-        arma::mat Qdt = this->Q_ * std::sqrt( dt );
+        arma::mat Qdt = this->Q_ * std::sqrt( std::abs( dt ) );
         this->P_ = this->F_ * this->P_;
         arma::mat QR_input_P_pred = arma::trans( arma::join_horiz( this->P_, Qdt ) ); // QR_input = [ P_, Qdt ], Транспонировать, т.к. в QR разложение так надо
         arma::mat Q_qr_P_pred, R_qr_P_pred;

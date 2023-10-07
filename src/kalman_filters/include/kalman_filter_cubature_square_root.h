@@ -46,6 +46,12 @@ public:
         this->SetFilterName( "SRCKF" );
 #endif
     }
+    // default copy/move/assignment semantic:
+    CKalmanSRCKF( const CKalmanSRCKF& ) = default;
+    CKalmanSRCKF& operator=( const CKalmanSRCKF& ) = default;
+    CKalmanSRCKF( CKalmanSRCKF&& ) = default;
+    CKalmanSRCKF& operator=( CKalmanSRCKF&& ) = default;
+    virtual ~CKalmanSRCKF() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы-сеттеры:
@@ -126,7 +132,7 @@ public:
             }
             this->dXcal_.col(i) *= std::sqrt( this->weights_covariance_(i) );
         }
-        arma::mat Qdt = this->Q_ * std::sqrt( dt );
+        arma::mat Qdt = this->Q_ * std::sqrt( std::abs( dt ) );
         arma::mat QR_input_P_pred = arma::trans( arma::join_horiz( this->dXcal_, Qdt ) ); // [ dXcal, Qdt ]', Транспонировать, т.к. в QR разложение так надо
 #ifdef DEBUG_KALMAN
         QR_input_P_pred.print( this->filterName_ + " Prediction, QR_input_P_pred:" );
@@ -342,6 +348,12 @@ public:
         this->SetFilterName( "SRCKFB" );
 #endif
     }
+    // default copy/move/assignment semantic:
+    CKalmanSRCKFB( const CKalmanSRCKFB& ) = default;
+    CKalmanSRCKFB& operator=( const CKalmanSRCKFB& ) = default;
+    CKalmanSRCKFB( CKalmanSRCKFB&& ) = default;
+    CKalmanSRCKFB& operator=( CKalmanSRCKFB&& ) = default;
+    virtual ~CKalmanSRCKFB() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы прогноза и коррекции:

@@ -41,24 +41,19 @@ public:
     ///
     /// \brief Конструктор по умолчанию
     ///
-    CKalmanCKF() : CKalmanEKF<SizeX, SizeY>(),
-        k_sigma_points_( 2 * SizeX ),
-        weights_mean_( arma::zeros( this->k_sigma_points_ ) ),
-        weights_covariance_( arma::zeros( this->k_sigma_points_ ) ),
-        x_est_sigma_points_( arma::zeros( SizeX, this->k_sigma_points_ ) ),
-        x_pred_sigma_points_( arma::zeros( SizeX, this->k_sigma_points_ ) ),
-        y_pred_sigma_points_( arma::zeros( SizeY, this->k_sigma_points_ ) ),
-
-        dXcal_( arma::zeros( SizeX, this->k_sigma_points_ ) ),
-        dYcal_( arma::zeros( SizeY, this->k_sigma_points_ ) ),
-        P_xy_( arma::zeros( SizeX, SizeY ) ),
-        sqrt_P_chol_( arma::zeros( SizeX, SizeX ) )
+    CKalmanCKF() : CKalmanEKF<SizeX, SizeY>()
     {
 #ifdef DEBUG_KALMAN
         this->SetFilterName( "CKF" );
 #endif
         this->SetupDesignParametersCubatureBaseSet();
-    }
+    }    
+    // default copy/move/assignment semantic:
+    CKalmanCKF( const CKalmanCKF& ) = default;
+    CKalmanCKF& operator=( const CKalmanCKF& ) = default;
+    CKalmanCKF( CKalmanCKF&& ) = default;
+    CKalmanCKF& operator=( CKalmanCKF&& ) = default;
+    virtual ~CKalmanCKF() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы-сеттеры:
@@ -154,7 +149,7 @@ protected:
         ( this->X_pred_ ).print( this->filterName_ + " Prediction, X_pred_:" );
 #endif
         // 4. Вычисление ковариационной матрицы Р
-        this->P_ = ( this->Q_ * dt );
+        this->P_ = ( this->Q_ * std::abs( dt ) );
         for( int i = 0; i < this->k_sigma_points_; i++ ) {
             this->dXcal_.col(i) = this->x_pred_sigma_points_.col(i) - this->X_pred_;
             if( this->checkDeltaState_ != nullptr ) {
@@ -310,20 +305,19 @@ protected:
 
     //------------------------------------------------------------------------------------------------------------------
     // Параметры, зависящие от SizeX, SizeY:
-    int k_sigma_points_;            ///< Число сигма-точек
-    arma::vec weights_mean_;        ///< Веса среднего
-    arma::vec weights_covariance_;  ///< Веса ковариации
-    arma::mat x_est_sigma_points_;  ///< Матрица сигма-точек (сигма-точки - столбцы) в пространстве X на текущем такте, размерность [SizeX,k_sigma_points_]
-    arma::mat x_pred_sigma_points_; ///< Матрица сигма-точек (сигма-точки - столбцы) в пространстве X, экстраполированный на текущий такт, размерность [SizeX,k_sigma_points_]
-    arma::mat y_pred_sigma_points_; ///< Матрица сигма-точек (сигма-точки - столбцы) в пространстве Y, экстраполированный на текущий такт, размерность [SizeX,k_sigma_points_]
+    static const int k_sigma_points_ = ( 2 * SizeX ); ///< Число сигма-точек
+    static constexpr double gamma_ = std::sqrt( SizeX );  ///< Автоматически вычисляемый (в методах SetDesignParameters*) параметр (множитель при корне из P при создании сигма-точек)
 
-    arma::mat dXcal_;       ///< Матрица Х-каллиграфическое (матрица сигма-точек - столбцов)
-    arma::mat dYcal_;       ///< Матрица Y-каллиграфическое (матрица сигма-точек - столбцов)
-    arma::mat P_xy_;        ///< Матрица кросс-коварации векторов Х и Y, размерность [SizeX * SizeY]
-    arma::mat sqrt_P_chol_; ///< Корень из матрицы P
-    //------------------------------------------------------------------------------------------------------------------
-    // Параметры выбора сигма-точек, определяемые в методах SetDesignParameters*
-    double gamma_;  ///< Автоматически вычисляемый (в методах SetDesignParameters*) параметр (множитель при корне из P при создании сигма-точек)
+    arma::vec::fixed<k_sigma_points_> weights_mean_; ///< Веса среднего
+    arma::vec::fixed<k_sigma_points_> weights_covariance_; ///< Веса ковариации
+    arma::mat::fixed<SizeX, k_sigma_points_> x_est_sigma_points_; ///< Матрица сигма-точек (сигма-точки - столбцы) в пространстве X на текущем такте, размерность [SizeX,k_sigma_points_]
+    arma::mat::fixed<SizeX, k_sigma_points_> x_pred_sigma_points_; ///< Матрица сигма-точек (сигма-точки - столбцы) в пространстве X, экстраполированный на текущий такт, размерность [SizeX,k_sigma_points_]
+    arma::mat::fixed<SizeY, k_sigma_points_> y_pred_sigma_points_; ///< Матрица сигма-точек (сигма-точки - столбцы) в пространстве Y, экстраполированный на текущий такт, размерность [SizeX,k_sigma_points_]
+
+    arma::mat::fixed<SizeX, k_sigma_points_> dXcal_; ///< Матрица Х-каллиграфическое (матрица сигма-точек - столбцов)
+    arma::mat::fixed<SizeY, k_sigma_points_> dYcal_; ///< Матрица Y-каллиграфическое (матрица сигма-точек - столбцов)
+    arma::mat::fixed<SizeX, SizeY> P_xy_; ///< Матрица кросс-коварации векторов Х и Y, размерность [SizeX * SizeY]
+    arma::mat::fixed<SizeX, SizeX> sqrt_P_chol_; ///< Корень из матрицы P
 
     //------------------------------------------------------------------------------------------------------------------
     // Обертки функций вычисления взвешенной суммы:
@@ -337,8 +331,7 @@ protected:
     ///
     void SetupDesignParametersCubatureBaseSet()
     {
-        double gammaSq = static_cast<double>( SizeX );
-        this->gamma_ = std::sqrt( gammaSq );
+        const double gammaSq = static_cast<double>( SizeX );
 
         // Set the weights for sigma points
         double all_points = 1.0 / ( 2.0 * gammaSq );

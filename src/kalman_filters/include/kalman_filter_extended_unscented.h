@@ -56,6 +56,12 @@ public:
         this->SetFilterName( "EUKF" );
 #endif
     }
+    // default copy/move/assignment semantic:
+    CKalmanEUKF( const CKalmanEUKF& ) = default;
+    CKalmanEUKF& operator=( const CKalmanEUKF& ) = default;
+    CKalmanEUKF( CKalmanEUKF&& ) = default;
+    CKalmanEUKF& operator=( CKalmanEUKF&& ) = default;
+    virtual ~CKalmanEUKF() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы-сеттеры:
