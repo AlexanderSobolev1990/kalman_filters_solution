@@ -293,8 +293,10 @@ public:
 
 protected:
     //------------------------------------------------------------------------------------------------------------------
-    // Матрицы знаков:            
+    // Матрицы знаков:
+
     static const int QRsizeY = ( SizeY + ( 2 * SizeX + 1 ) );
+    /*
     arma::mat::fixed<QRsizeY, QRsizeY> JcorrectBlock_ = arma::mat::fixed<QRsizeY, QRsizeY>( arma::fill::eye ); ///< Матрица знаков для фильтра в блочном виде
 
     //------------------------------------------------------------------------------------------------------------------
@@ -302,12 +304,28 @@ protected:
     /// \brief Создание матриц знаков
     ///
     virtual void createSignMatrices()
-    {        
+    {
+        if( this->negativeZeroCovWeight_ ) {
+            this->Jpredict_( this->JQR_predict_size  - 1, this->JQR_predict_size - 1 ) = -1.0;
+            this->JcorrectBlock_( this->QRsizeY - 1, this->QRsizeY - 1 ) = -1.0;
+        }
+    }
+    */
+    arma::mat JcorrectBlock_; ///< Матрица знаков для фильтра в блочном виде
+
+    //------------------------------------------------------------------------------------------------------------------
+    ///
+    /// \brief Создание матриц знаков
+    ///
+    virtual void createSignMatrices() //Block()
+    {
+        this->Jpredict_ = arma::mat( this->JQR_predict_size, this->JQR_predict_size, arma::fill::eye );
+        this->JcorrectBlock_ = arma::mat( this->QRsizeY, this->QRsizeY, arma::fill::eye );
         if( this->negativeZeroCovWeight_ ) {
             this->Jpredict_( this->JQR_predict_size - 1, this->JQR_predict_size - 1 ) = -1.0;
             this->JcorrectBlock_( this->QRsizeY - 1, this->QRsizeY - 1 ) = -1.0;
         }
-    }    
+    }
 };
 
 }

@@ -61,7 +61,7 @@ public:
 //    CKalmanUKF& operator=( const CKalmanUKF& ) = default;
 //    CKalmanUKF( CKalmanUKF&& ) = default;
 //    CKalmanUKF& operator=( CKalmanUKF&& ) = default;
-//    virtual ~CKalmanUKF() = default;
+    virtual ~CKalmanUKF() = default;
 
     //------------------------------------------------------------------------------------------------------------------
     // Методы-сеттеры:
