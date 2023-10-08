@@ -66,7 +66,7 @@ public:
 #ifdef DEBUG_KALMAN
         this->SetFilterName( "SRUKF" );
 #endif
-        createSignMatrices();
+//        createSignMatrices();
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -110,6 +110,8 @@ public:
         this->alpha_ = 0.0;
         this->beta_ = 0.0;
         this->lambda_ = 0.0;
+
+        this->createSignMatrices();
 
 #ifdef DEBUG_KALMAN
         std::cout << this->filterName_ + " SetupDesignParametersMeanSet:" << std::endl;
@@ -165,6 +167,8 @@ public:
         // Параметр w0_ при данном способе создания сигма точек не используется:
         this->w0_ = 0.0;
 
+        this->createSignMatrices();
+
 #ifdef DEBUG_KALMAN
         std::cout << this->filterName_ + " SetupDesignParametersScaledSet:" << std::endl;
         std::cout << "weights_mean_:" << std::endl;
@@ -215,6 +219,8 @@ public:
         this->kappa_ = 0.0;
         this->w0_ = 0.0;
         this->lambda_ = 0.0;
+
+        this->createSignMatrices();
 
 #ifdef DEBUG_KALMAN
         std::cout << this->filterName_ + " SetupDesignParametersCDKF:" << std::endl;
@@ -523,7 +529,7 @@ protected:
     ///
     /// \brief Создание матриц знаков
     ///
-    void createSignMatrices()
+    virtual void createSignMatrices()
     {
         int JQR_predict_size = ( 2 * SizeX + 1 ) + SizeX;
         int JQR_correct_size = ( 2 * SizeX + 1 ) + SizeY;
@@ -900,7 +906,7 @@ public:
 #ifdef DEBUG_KALMAN
         this->SetFilterName( "SRUKFB" );
 #endif
-        createSignMatricesBlock();
+//        createSignMatricesBlock();
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -1034,8 +1040,22 @@ protected:
     ///
     /// \brief Создание матриц знаков
     ///
-    void createSignMatricesBlock()
+    virtual void createSignMatrices() //Block()
     {
+        int JQR_predict_size = ( 2 * SizeX + 1 ) + SizeX;
+        int JQR_correct_size = ( 2 * SizeX + 1 ) + SizeY;
+        this->Jpredict_ = arma::mat( JQR_predict_size, JQR_predict_size, arma::fill::eye );
+        this->Jcorrect_ = arma::mat( JQR_correct_size, JQR_correct_size, arma::fill::eye );
+        if( this->weights_covariance_( this->k_sigma_points_- 1 ) < 0.0 ) {
+            this->Jpredict_( JQR_predict_size-1, JQR_predict_size-1 ) = -1.0;
+            this->Jcorrect_( JQR_correct_size-1, JQR_correct_size-1 ) = -1.0;
+        }
+
+        this->J_ = arma::mat( this->k_sigma_points_, this->k_sigma_points_, arma::fill::eye );
+        if( this->weights_covariance_( this->k_sigma_points_- 1 ) < 0.0 ) {
+            this->J_( this->k_sigma_points_- 1, this->k_sigma_points_- 1 ) = -1.0;
+        }
+
         int QRsizeY = ( SizeY + ( 2 * SizeX + 1 ) );
         JcorrectBlock_ = arma::mat( QRsizeY, QRsizeY, arma::fill::eye );
         if( this->weights_covariance_( this->k_sigma_points_- 1 ) < 0.0 ) {
