@@ -53,7 +53,7 @@ template<size_t SizeX, size_t SizeY>
 class CKalmanSRUKF : public CKalmanUKF<SizeX, SizeY>
 {
 public:
-    using CKalmanUKF<SizeX, SizeY>::CKalmanUKF;
+//    using CKalmanUKF<SizeX, SizeY>::CKalmanUKF;
     //------------------------------------------------------------------------------------------------------------------
     // Конструкторы:
 
@@ -526,8 +526,8 @@ protected:
     //------------------------------------------------------------------------------------------------------------------
     // Матрицы знаков
     
-    static const int JQR_predict_size = ( 2 * SizeX + 1 ) + SizeX;
-    static const int JQR_correct_size = ( 2 * SizeX + 1 ) + SizeY;
+    static const int JQR_predict_size_SRUKF = ( 2 * SizeX + 1 ) + SizeX;
+    static const int JQR_correct_size_SRUKF = ( 2 * SizeX + 1 ) + SizeY;
     /*
     arma::mat::fixed<CKalmanSRUKF::k_sigma_points_, CKalmanSRUKF::k_sigma_points_> J_ =
         arma::mat::fixed<CKalmanSRUKF::k_sigma_points_, CKalmanSRUKF::k_sigma_points_>( arma::fill::eye ); ///< Матрица знаков при Pxy
@@ -565,13 +565,13 @@ protected:
     {
         //int JQR_predict_size = ( 2 * SizeX + 1 ) + SizeX;
         //int JQR_correct_size = ( 2 * SizeX + 1 ) + SizeY;
-        this->Jpredict_ = arma::mat( this->JQR_predict_size, this->JQR_predict_size, arma::fill::eye );
-        this->Jcorrect_ = arma::mat( this->JQR_correct_size, this->JQR_correct_size, arma::fill::eye );
+        this->Jpredict_ = arma::mat( this->JQR_predict_size_SRUKF, this->JQR_predict_size_SRUKF, arma::fill::eye );
+        this->Jcorrect_ = arma::mat( this->JQR_correct_size_SRUKF, this->JQR_correct_size_SRUKF, arma::fill::eye );
         this->J_ = arma::mat( this->k_sigma_points_, this->k_sigma_points_, arma::fill::eye );
         
         if( this->negativeZeroCovWeight_ ) {
-            this->Jpredict_( this->JQR_predict_size - 1, this->JQR_predict_size - 1 ) = -1.0;
-            this->Jcorrect_( this->JQR_correct_size - 1, this->JQR_correct_size - 1 ) = -1.0;
+            this->Jpredict_( this->JQR_predict_size_SRUKF - 1, this->JQR_predict_size_SRUKF - 1 ) = -1.0;
+            this->Jcorrect_( this->JQR_correct_size_SRUKF - 1, this->JQR_correct_size_SRUKF - 1 ) = -1.0;
             this->J_( this->k_sigma_points_ - 1, this->k_sigma_points_ - 1 ) = -1.0;
         }
     }
@@ -937,7 +937,7 @@ template<size_t SizeX, size_t SizeY>
 class CKalmanSRUKFB : public CKalmanSRUKF<SizeX, SizeY>
 {
 public:
-    using CKalmanSRUKF<SizeX, SizeY>::CKalmanSRUKF;
+//    using CKalmanSRUKF<SizeX, SizeY>::CKalmanSRUKF;
     //------------------------------------------------------------------------------------------------------------------
     // Конструкторы:
 
@@ -1084,7 +1084,7 @@ protected:
     //------------------------------------------------------------------------------------------------------------------
     // Матрицы знаков:
     
-    static const int QRsizeY = ( SizeY + ( 2 * SizeX + 1 ) );
+    static const int QRsizeY_SRUKFB = ( SizeY + ( 2 * SizeX + 1 ) );
     /*
     arma::mat::fixed<QRsizeY, QRsizeY> JcorrectBlock_ = arma::mat::fixed<QRsizeY, QRsizeY>( arma::fill::eye ); ///< Матрица знаков для фильтра в блочном виде
 
@@ -1108,11 +1108,22 @@ protected:
     ///
     virtual void createSignMatrices() //Block()
     {        
-        this->Jpredict_ = arma::mat( this->JQR_predict_size, this->JQR_predict_size, arma::fill::eye );
-        this->JcorrectBlock_ = arma::mat( this->QRsizeY, this->QRsizeY, arma::fill::eye );        
+//        this->Jpredict_ = arma::mat( this->JQR_predict_size_SRUKF, this->JQR_predict_size_SRUKF, arma::fill::eye );
+//        this->JcorrectBlock_ = arma::mat( this->QRsizeY_SRUKFB, this->QRsizeY_SRUKFB, arma::fill::eye );
+//        if( this->negativeZeroCovWeight_ ) {
+//            this->Jpredict_( this->JQR_predict_size_SRUKF - 1, this->JQR_predict_size_SRUKF - 1 ) = -1.0;
+//            this->JcorrectBlock_( this->QRsizeY_SRUKFB - 1, this->QRsizeY_SRUKFB - 1 ) = -1.0;
+//        }
+
+        this->Jpredict_ = arma::mat( this->JQR_predict_size_SRUKF, this->JQR_predict_size_SRUKF, arma::fill::eye );
+        this->Jcorrect_ = arma::mat( this->JQR_correct_size_SRUKF, this->JQR_correct_size_SRUKF, arma::fill::eye );
+        this->J_ = arma::mat( this->k_sigma_points_, this->k_sigma_points_, arma::fill::eye );
+        this->JcorrectBlock_ = arma::mat( this->QRsizeY_SRUKFB, this->QRsizeY_SRUKFB, arma::fill::eye );
         if( this->negativeZeroCovWeight_ ) {
-            this->Jpredict_( this->JQR_predict_size - 1, this->JQR_predict_size - 1 ) = -1.0;
-            this->JcorrectBlock_( this->QRsizeY - 1, this->QRsizeY - 1 ) = -1.0;
+            this->Jpredict_( this->JQR_predict_size_SRUKF - 1, this->JQR_predict_size_SRUKF - 1 ) = -1.0;
+            this->Jcorrect_( this->JQR_correct_size_SRUKF - 1, this->JQR_correct_size_SRUKF - 1 ) = -1.0;
+            this->J_( this->k_sigma_points_ - 1, this->k_sigma_points_ - 1 ) = -1.0;
+            this->JcorrectBlock_( this->QRsizeY_SRUKFB - 1, this->QRsizeY_SRUKFB - 1 ) = -1.0;
         }
     }
 };

@@ -211,9 +211,9 @@ public:
         // 2. Выполнить JQR разложение блочной матрицы B и считать результат:
         // [ S     0 ]
         // [ Pxy*  P ]
-        size_t QRsizeY = ( SizeY + ( 2 * SizeX ) );
+//        size_t QRsizeY = ( SizeY + ( 2 * SizeX ) );
         arma::mat Q_qr_corr, R_qr_corr;
-        arma::mat JcorrectBlock( QRsizeY, QRsizeY, arma::fill::eye );
+//        arma::mat JcorrectBlock( QRsizeY, QRsizeY, arma::fill::eye );
         int res_JQR_corr = SPML::QR::ModifiedGramSchmidt( Q_qr_corr, R_qr_corr, B );
         assert( res_JQR_corr == 0 );
         R_qr_corr = arma::trans( R_qr_corr ); // Транспонировать, т.к. в JQR разложение так надо
