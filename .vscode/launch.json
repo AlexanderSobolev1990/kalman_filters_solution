@@ -1,0 +1,89 @@
+{    
+    "version": "0.2.0",
+    "configurations": [
+        // Отладка
+        {
+            "name": "Debug",
+            "type": "cppdbg",
+            "request": "launch",
+            // Resolved by CMake Tools:
+            "program": "${command:cmake.launchTargetPath}",
+            "args": [
+                "--dt", "1",// "1.0",// 
+                "--all",
+                // "--ekf",
+                // "--srekf",
+                // "--srekfb",
+                //
+                // "--ukf",
+                // "--srukf",
+                // "--srukfb",
+                //
+                // "--ckf",
+                // "--srckf",
+                // "--srckfb",
+                //
+                // "--eukf",
+                //"--sreukf",
+                // "--sreukfb",
+                //
+                // "--eckf",
+                // "--sreckf",
+                // "--sreckfb",
+                //                
+                "--show", 
+                "--graph", "0", // 0 - state, 1 - rmse
+                // "--variormse",
+                "--mc", "10",
+                "--eks", "0", // "0",
+                //
+                "--alpha", "1",//"0.687369",//
+                "--beta", "0",// "0.67", //"2", // "1.3334",
+                "--kappa", "5", //"0", "2", "4", "6", "8", //"-4", "-2", 
+                //
+                "--alpha_sr", "1",// "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9", "0.999",
+                "--beta_sr", "0",
+                "--kappa_sr", "5",
+                // "--kappa_sr", "0", "3", "6", "9",
+                // "--kappa_sr", "0", "-0.5", "-1", "-1.5", "-2", // "8", //"4", "-2", //"-2",//
+                // "--kappa_sr", "0.001", "1", "3", "5", "9", // "8", //"4", "-2", //"-2",//
+                // "--kappa_sr", "0", "5", "10", "15", "20", // "8", //"4", "-2", //"-2",//
+                // "--kappa_sr", "25", "50", "75", "100", // "8", //"4", "-2", //"-2",//
+                //
+                "--time", "200",
+                // "--xstart", "2000", "45", "200.0", "1.0e-6", "65.0", "1.0e-6", "400.0",                            
+                "--xstart", "100", "100", "200.0", "60.0", "1.0e-6",
+                "--sep",
+                "--size", "60", "40",
+                "--par", "0.12", "0.2", "0.82", "0.88", "0.2", "0.2", // для time
+                // "--seed", "2"
+                // "--qkoefekf", "1", "1", "3", "3", "1",
+                // "--qkoefukf", "0.01", "0.01", "0.01", "0.01", "0.01",
+            ],
+            "stopAtEntry": false,
+            // "cwd": "${workspaceFolder}", // Original            
+            "cwd": "${command:cmake.getLaunchTargetDirectory}",
+            "environment": [
+                {
+                    // add the directory where our target was built to the PATHs
+                    // it gets resolved by CMake Tools:
+                    "name": "PATH",
+                    "value": "${env:PATH}:${command:cmake.getLaunchTargetDirectory}"
+                },
+                {
+                    "name": "OTHER_VALUE",
+                    "value": "Something something"
+                }
+            ],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}
